@@ -109,7 +109,9 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="player.cpp" />
     <ClCompile Include="playerBullet.cpp" />
+    <ClCompile Include="railCamera.cpp" />
     <ClCompile Include="scene\GameScene.cpp" />
+    <ClCompile Include="sky.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="2d\DebugText.h" />
@@ -147,8 +149,9 @@
     <ClInclude Include="math\Vector4.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="playerBullet.h" />
-    <ClInclude Include="resource.h" />
+    <ClInclude Include="railCamera.h" />
     <ClInclude Include="scene\GameScene.h" />
+    <ClInclude Include="sky.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\shaders\TerrainPS.hlsl">
@@ -204,9 +207,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\shaders\Sprite.hlsli" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="DirectXGame.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
