@@ -147,7 +147,6 @@
     <ClInclude Include="math\Vector4.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="playerBullet.h" />
-    <ClInclude Include="resource.h" />
     <ClInclude Include="scene\GameScene.h" />
   </ItemGroup>
   <ItemGroup>
@@ -204,9 +203,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\shaders\Sprite.hlsli" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="DirectXGame.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

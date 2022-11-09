@@ -1,7 +1,7 @@
 #pragma once
 
 #include "WorldTransform.h"
-#include"PrimitiveDrawer.h"
+//#include"PrimitiveDrawer.h"
 
 namespace affine
 {
