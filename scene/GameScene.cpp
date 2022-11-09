@@ -1,10 +1,13 @@
 ﻿#include "GameScene.h"
 #include "TextureManager.h"
 #include <cassert>
+#include"affine.h"
 
 GameScene::GameScene() {}
 
-GameScene::~GameScene() {}
+GameScene::~GameScene() {
+	delete model_;
+}
 
 void GameScene::Initialize() {
 
@@ -12,9 +15,32 @@ void GameScene::Initialize() {
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
 	debugText_ = DebugText::GetInstance();
+
+	model_ = new Model;
+
+	model_->Create();
+
+	worldTransform.Initialize();
+
+	worldTransform.translation_ = Vector3(0,0,0);
+
+	affine::makeMatTrans(worldTransform.matWorld_,worldTransform.translation_);
+
+	worldTransform.TransferMatrix();
+
+	player_ = std::make_unique<player>();
+	railCamera_ = std::make_unique<RailCamera>();
+	sky_ = std::make_unique<sky>();
+
+	sky_->Initialize();
+	player_->Initialize();
+	railCamera_->Initialize(Vector3(0,5,-50),Vector3(0,0,0), player_->GetWorldTransform());
 }
 
-void GameScene::Update() {}
+void GameScene::Update() {
+	player_->Update();
+	railCamera_->Update();
+}
 
 void GameScene::Draw() {
 
@@ -41,6 +67,9 @@ void GameScene::Draw() {
 
 	/// <summary>
 	/// ここに3Dオブジェクトの描画処理を追加できる
+	model_->Draw(worldTransform,railCamera_->GetViewProjection());
+	player_->Draw(railCamera_->GetViewProjection());
+	sky_->Draw(railCamera_->GetViewProjection());
 	/// </summary>
 
 	// 3Dオブジェクト描画後処理

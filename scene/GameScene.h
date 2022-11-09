@@ -9,6 +9,11 @@
 #include "Sprite.h"
 #include "ViewProjection.h"
 #include "WorldTransform.h"
+#include"player.h"
+#include"playerBullet.h"
+#include"railCamera.h"
+#include"sky.h"
+#include<sstream>
 
 /// <summary>
 /// ゲームシーン
@@ -46,6 +51,16 @@ class GameScene {
 	Input* input_ = nullptr;
 	Audio* audio_ = nullptr;
 	DebugText* debugText_ = nullptr;
+
+	std::unique_ptr<player> player_;
+	std::unique_ptr<RailCamera> railCamera_ = nullptr;
+	std::unique_ptr<sky> sky_=nullptr;
+
+	Model* model_ = nullptr;
+	WorldTransform worldTransform;
+
+	//テクスチャハンドル
+	uint32_t textureHandle_ = 0u;
 
 	/// <summary>
 	/// ゲームシーン用
