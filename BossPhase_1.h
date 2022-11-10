@@ -4,6 +4,7 @@
 #include "ViewProjection.h"
 #include "affine.h"
 #include "Input.h"
+#include "DebugText.h"
 #include <cassert>
 class BossPhase_1
 {
@@ -28,7 +29,11 @@ private:// メンバ変数
 	//ワールド変換データ
 	WorldTransform worldTransform_[27];
 
+	// 消すときのフラグ
 	bool RespawnFlag[27];
+
+	DebugText* debugText_ = nullptr;
+
 
 	//モデル
 	Model* model_ = nullptr;
@@ -48,11 +53,18 @@ private:// メンバ変数
 	// ブロックを浮かし終わるまでのフラグ
 	bool FloatBlockFlagM = false; // 座標をマイナス
 	bool FloatBlockFlagP = false; // 座標をプラス
+	bool FloatXRimitFlag = false; // 横に出すときの制限フラグ
 
 	// ブロックを動かす前の位置
 	Vector3 oldPos;
 
 	// 飛ばしたブロックのリスポーンフラグ
 	bool randomRespawnFlag = false;
+
+	// 飛ばしたブロックプレイヤーに向かって回転するフラグ
+	bool flyToPlayerFlag = false;
+
+	// ベクトル
+	Vector3 velocity;
 };
 

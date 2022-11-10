@@ -18,8 +18,8 @@ void BossPhase_1::Initialize(Model* model)
 	
 
 	// 親
-	worldTransform_[0].translation_ = { 0,0,0 };
-
+	worldTransform_[0].translation_ = { 0,0,50 };
+	debugText_ = DebugText::GetInstance();
 
 
 	// 子の座標設定
@@ -70,14 +70,17 @@ void BossPhase_1::Update()
 		else if (input_->PushKey(DIK_LEFT)) { worldTransform_[0].translation_.x -= 1.0f; }
 	}
 
-	FlyBlocks({ 0,0,15 });
+	FlyBlocks({ 0,0,10 });
 
 	// 行列の更新と転送
 	for (int i = 0; i < 27; i++) {
 		affine::makeAffine(worldTransform_[i]);
 	}
 	for (int i = 1; i < 27; i++) {
-		worldTransform_[i].matWorld_ *= worldTransform_[0].matWorld_;
+		if (RespawnFlag[i] == false)
+		{
+			worldTransform_[i].matWorld_ *= worldTransform_[0].matWorld_;
+		}
 	}
 	for (int i = 0; i < 27; i++) {
 		worldTransform_[i].TransferMatrix();
@@ -91,41 +94,75 @@ void BossPhase_1::Draw(ViewProjection viewprojection)
 		{
 			model_->Draw(worldTransform_[i], viewprojection);
 		}
+
 	}
 }
 
 void BossPhase_1::FlyBlocks(Vector3 playerPos)
 {
 	FloatRandomBlocks();
+	
 
 	// プラスフラグ
-	if (FloatBlockFlagP == true) {
+	if (FloatBlockFlagP == true && FloatXRimitFlag == false) {
 		worldTransform_[randomBlock].translation_.x += 0.1f;
 
 		if (worldTransform_[randomBlock].translation_.x >= oldPos.x + 10.0f) {
-			FloatBlockFlagP = false;
+			// 制限に移動したらフラグをオン
+			FloatXRimitFlag = true;
 			//お試しリスポーン
-			randomRespawnFlag = true;
+			flyToPlayerFlag = true;
 			worldTransform_[randomBlock].translation_.x = oldPos.x + 10.0f;
-			RespawnFlag[randomBlock] = true;
+			
+
+			// プレイヤーに向かうベクトルの計算
+			velocity.x = playerPos.x - worldTransform_[randomBlock].translation_.x;
+			velocity.y = playerPos.y - worldTransform_[randomBlock].translation_.y;
+			velocity.z = playerPos.z - worldTransform_[randomBlock].translation_.z;
+
+			velocity.normalize();
+			velocity *= 0.1f;
 		}
 	}
 
 
 	// マイナスフラグ
-	if (FloatBlockFlagM == true) {
+	if (FloatBlockFlagM == true && FloatXRimitFlag == false) {
 		worldTransform_[randomBlock].translation_.x -= 0.1f;
 
 		if (worldTransform_[randomBlock].translation_.x <= oldPos.x - 10.0f) {
-			FloatBlockFlagM = false;
+			// 制限に移動したらフラグをオン
+			FloatXRimitFlag = true;
 			//お試しリスポーン
-			randomRespawnFlag = true;
+			flyToPlayerFlag = true;
 			worldTransform_[randomBlock].translation_.x = oldPos.x - 10.0f;
-			RespawnFlag[randomBlock] = true;
+			
+
+			// プレイヤーに向かうベクトルの計算
+			velocity.x = playerPos.x - worldTransform_[randomBlock].translation_.x;
+			velocity.y = playerPos.y - worldTransform_[randomBlock].translation_.y;
+			velocity.z = playerPos.z - worldTransform_[randomBlock].translation_.z;
+
+			velocity.normalize();
+			velocity *= 0.1f;
 		}
 	}
 	
+	// プレイヤーに向かって飛ぶ処理
+	if (flyToPlayerFlag == true) {
+		// 回転しながら飛んでいく
+		worldTransform_[randomBlock].rotation_.z += 0.2f;
 
+		// プレイヤーに向かって飛ぶ
+		worldTransform_[randomBlock].translation_ += velocity;
+
+		if (worldTransform_[randomBlock].translation_.y < playerPos.y) {
+			flyToPlayerFlag = false;
+			RespawnFlag[randomBlock] = true;
+		}
+	}
+	debugText_->SetPos(20, 60);
+	debugText_->Printf("飛ぶやつ:%f,%f,%f", worldTransform_[randomBlock].translation_.x, worldTransform_[randomBlock].translation_.y, worldTransform_[randomBlock].translation_.z);
 
 }
 
@@ -138,10 +175,10 @@ void BossPhase_1::FloatRandomBlocks()
 	}
 
 	// 再抽選が終わったら
-	if (worldTransform_[randomBlock].translation_.x > worldTransform_[0].translation_.x) {
+	if (worldTransform_[randomBlock].translation_.x > worldTransform_[0].translation_.x && FloatBlockFlagP == false) {
 		FloatBlockFlagP = true;
 	}
-	else if (worldTransform_[randomBlock].translation_.x < worldTransform_[0].translation_.x) {
+	else if (worldTransform_[randomBlock].translation_.x < worldTransform_[0].translation_.x && FloatBlockFlagM == false) {
 		FloatBlockFlagM = true;
 	}
 

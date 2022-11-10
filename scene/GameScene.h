@@ -13,6 +13,7 @@
 #include"playerBullet.h"
 #include"railCamera.h"
 #include"sky.h"
+#include "BossPhase_1.h"
 #include<sstream>
 
 /// <summary>
@@ -58,6 +59,7 @@ class GameScene {
 
 	Model* model_ = nullptr;
 	WorldTransform worldTransform;
+	BossPhase_1* bossPhase_1;
 
 	//テクスチャハンドル
 	uint32_t textureHandle_ = 0u;

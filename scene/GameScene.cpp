@@ -28,6 +28,10 @@ void GameScene::Initialize() {
 
 	worldTransform.TransferMatrix();
 
+	bossPhase_1 = new BossPhase_1();
+	bossPhase_1->Initialize(model_);
+	
+
 	player_ = std::make_unique<player>();
 	railCamera_ = std::make_unique<RailCamera>();
 	sky_ = std::make_unique<sky>();
@@ -40,6 +44,9 @@ void GameScene::Initialize() {
 void GameScene::Update() {
 	player_->Update();
 	railCamera_->Update();
+
+	// ボスのフェーズ1の更新
+	bossPhase_1->Update();
 }
 
 void GameScene::Draw() {
@@ -69,6 +76,10 @@ void GameScene::Draw() {
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	model_->Draw(worldTransform,railCamera_->GetViewProjection());
 	player_->Draw(railCamera_->GetViewProjection());
+
+	// ボスフェーズ１の描画
+	bossPhase_1->Draw(railCamera_->GetViewProjection());
+
 	sky_->Draw(railCamera_->GetViewProjection());
 	/// </summary>
 

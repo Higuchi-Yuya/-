@@ -102,11 +102,13 @@
     <ClCompile Include="base\DirectXCommon.cpp" />
     <ClCompile Include="base\TextureManager.cpp" />
     <ClCompile Include="base\WinApp.cpp" />
+    <ClCompile Include="BossBullet.cpp" />
     <ClCompile Include="BossManager.cpp" />
     <ClCompile Include="BossPhase_1.cpp" />
     <ClCompile Include="BossPhase_2.cpp" />
     <ClCompile Include="BossPhase_3.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="math\Vector3.cpp" />
     <ClCompile Include="player.cpp" />
     <ClCompile Include="playerBullet.cpp" />
     <ClCompile Include="railCamera.cpp" />
@@ -137,6 +139,7 @@
     <ClInclude Include="base\SafeDelete.h" />
     <ClInclude Include="base\TextureManager.h" />
     <ClInclude Include="base\WinApp.h" />
+    <ClInclude Include="BossBullet.h" />
     <ClInclude Include="BossManager.h" />
     <ClInclude Include="BossPhase_1.h" />
     <ClInclude Include="BossPhase_2.h" />
