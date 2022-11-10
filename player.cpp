@@ -113,12 +113,12 @@ void player::Update() {
 }
 
 void player::Attack() {
-	XINPUT_STATE joyState;
+	/*XINPUT_STATE joyState;
 	if (!Input::GetInstance()->GetJoystickState(0, joyState))
 	{
 		return;
-	}
-	if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) {
+	}*/
+	if (input_->TriggerKey(DIK_R)) {
 		//’e‚Ì‘¬“x
 		const float kBulletSpeed = 1.0f;
 		Vector3 velocity(0, 0, kBulletSpeed);
@@ -132,11 +132,7 @@ void player::Attack() {
 
 		//’e‚Ì¶¬‚µA‰Šú‰»
 		std::unique_ptr<playerBullet> newBullet = std::make_unique<playerBullet>();
-		Vector3 playerWolrdPos = worldTransform_.parent_->translation_;
-		playerWolrdPos += worldTransform_.translation_;
-		Vector3 playerWolrdRot = worldTransform_.parent_->rotation_;
-		playerWolrdRot += worldTransform_.rotation_;
-		newBullet->Initialize(GetworldPosition(), velocity);
+		newBullet->Initialize(worldTransform_.translation_,worldTransform_.rotation_, velocity);
 
 		//’e‚Ì“o˜^‚·‚é
 		bullets_.push_back(std::move(newBullet));
