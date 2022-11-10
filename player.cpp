@@ -31,8 +31,8 @@ void player::Update() {
 	//自機のワールド座標から移動ベクトルを計算
 	Vector3 vectorX = { 1.0,0,0 };
 	vectorX = affine::MatVector(worldTransform_.matWorld_, vectorX);
-	Vector3 vectorY = { 0,0,1.0 };
-	vectorY = affine::MatVector(worldTransform_.matWorld_, vectorY);
+	Vector3 vectorZ = { 0,0,1.0 };
+	vectorZ = affine::MatVector(worldTransform_.matWorld_, vectorZ);
 
 	Vector3 move = { 0,0,0 };
 	Vector3 rot = { 0,0,0 };
@@ -56,34 +56,34 @@ void player::Update() {
 	}
 	if (input_->PushKey(DIK_W))
 	{
-		move.x = 1 * vectorY.x;
-		move.z = 1 * vectorY.z;
+		move.x = 1 * vectorZ.x;
+		move.z = 1 * vectorZ.z;
 	}
 	if (input_->PushKey(DIK_S))
 	{
-		move.x = -1 * vectorY.x;
-		move.z = -1 * vectorY.z;
+		move.x = -1 * vectorZ.x;
+		move.z = -1 * vectorZ.z;
 	}
 	if (input_->PushKey(DIK_Q))
 	{
-		rot.y = 0.001;
+		rot.y = -1;
 	}
 	if (input_->PushKey(DIK_E))
 	{
-		rot.y = -0.001;
+		rot.y = 1;
 	}
 	if (input_->PushKey(DIK_Z))
 	{
-		rot.x = -0.001;
+		rot.x = -1;
 	}
 	if (input_->PushKey(DIK_X))
 	{
-		rot.x = 0.001;
+		rot.x = 1;
 	}
 
 	worldTransform_.translation_ += move;
-	worldTransform_.rotation_.y += rot.y * (180 / PI);
-	worldTransform_.rotation_.x += rot.x * (180 / PI);
+	worldTransform_.rotation_.y += rot.y *affine::Deg2Rad;
+	worldTransform_.rotation_.x += rot.x * affine::Deg2Rad;
 	//移動限界座標
 	const float kRotLimit = 30.0 * affine::Deg2Rad;
 
@@ -113,12 +113,12 @@ void player::Update() {
 }
 
 void player::Attack() {
-	XINPUT_STATE joyState;
+	/*XINPUT_STATE joyState;
 	if (!Input::GetInstance()->GetJoystickState(0, joyState))
 	{
 		return;
-	}
-	if (joyState.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) {
+	}*/
+	if (input_->TriggerKey(DIK_R)) {
 		//弾の速度
 		const float kBulletSpeed = 1.0f;
 		Vector3 velocity(0, 0, kBulletSpeed);
@@ -132,11 +132,7 @@ void player::Attack() {
 
 		//弾の生成し、初期化
 		std::unique_ptr<playerBullet> newBullet = std::make_unique<playerBullet>();
-		Vector3 playerWolrdPos = worldTransform_.parent_->translation_;
-		playerWolrdPos += worldTransform_.translation_;
-		Vector3 playerWolrdRot = worldTransform_.parent_->rotation_;
-		playerWolrdRot += worldTransform_.rotation_;
-		newBullet->Initialize(GetworldPosition(), velocity);
+		newBullet->Initialize(worldTransform_.translation_,worldTransform_.rotation_, velocity);
 
 		//弾の登録する
 		bullets_.push_back(std::move(newBullet));

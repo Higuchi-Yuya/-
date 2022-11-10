@@ -18,8 +18,6 @@ void GameScene::Initialize() {
 
 	model_ = new Model;
 
-	model_->Create();
-
 	worldTransform.Initialize();
 
 	worldTransform.translation_ = Vector3(0,0,0);
@@ -28,8 +26,10 @@ void GameScene::Initialize() {
 
 	worldTransform.TransferMatrix();
 
-	bossPhase_1 = new BossPhase_1();
+	bossPhase_1 = std::make_unique<BossPhase_1>();
 	bossPhase_1->Initialize(model_);
+	bossPhase_3 = std::make_unique<BossPhase_3>();
+	bossPhase_3->Initialize();
 	
 
 	player_ = std::make_unique<player>();
@@ -47,6 +47,8 @@ void GameScene::Update() {
 
 	// ボスのフェーズ1の更新
 	bossPhase_1->Update();
+	// ボスのフェーズ3の更新
+	bossPhase_3->Update();
 }
 
 void GameScene::Draw() {
@@ -79,6 +81,8 @@ void GameScene::Draw() {
 
 	// ボスフェーズ１の描画
 	bossPhase_1->Draw(railCamera_->GetViewProjection());
+	// ボスフェーズ3の描画
+	bossPhase_3->Draw(railCamera_->GetViewProjection());
 
 	sky_->Draw(railCamera_->GetViewProjection());
 	/// </summary>

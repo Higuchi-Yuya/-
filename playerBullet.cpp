@@ -3,16 +3,18 @@
 #include<cassert>
 #include"affine.h"
 
-void playerBullet::Initialize( const Vector3& position, const Vector3& velocity)
+void playerBullet::Initialize( const Vector3& Position,Vector3 Rot, const Vector3& velocity)
 {
 
-	model_->Create();
+	model_=Model::Create();
 	//テクスチャ読み込み
-	textureHandle_ = TextureManager::Load("mario.jpg");
+	textureHandle_ = TextureManager::Load("uvChecker.png");
 
 	worldTransform_.Initialize();
 
-	worldTransform_.translation_ = position;
+	worldTransform_.translation_ = Position;
+
+	worldTransform_.rotation_ = Rot;
 
 	velocity_ = velocity;
 }
@@ -31,7 +33,7 @@ void playerBullet::Update()
 }
 void playerBullet::Draw(const ViewProjection& viewProjection)
 {
-	model_->Draw(worldTransform_, viewProjection, textureHandle_);
+	model_->Draw(worldTransform_, viewProjection);
 }
 void playerBullet::OnCollision()
 {
