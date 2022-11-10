@@ -1,5 +1,5 @@
 ﻿#pragma once
-
+#include "Matrix4.h"
 /// <summary>
 /// 3次元ベクトル
 /// </summary>
@@ -28,6 +28,11 @@ class Vector3 {
 	Vector3& operator-=(const Vector3& v);
 	Vector3& operator*=(float s);
 	Vector3& operator/=(float s);
-
+	Vector3& operator*(float s);
+	Vector3& operator*(const Matrix4& m);
 
 };
+const Vector3 operator+(const Vector3& v1, const Vector3& v2);
+const Vector3 operator-(const Vector3& v1, const Vector3& v2);
+const Vector3 operator*(const Vector3& v1, const Vector3& v2);
+const Vector3 operator*(float s, const Vector3& v1);

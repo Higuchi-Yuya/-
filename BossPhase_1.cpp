@@ -12,15 +12,15 @@ void BossPhase_1::Initialize(Model* model)
 
 		worldTransform_[i].Initialize();
 		// フラグ
-		RespawnFlag[i] = false;
+		AnnihilationFlag[i] = false;
 	}
 
-	
-
 	// 親
-	worldTransform_[0].translation_ = { 0,0,50 };
+	worldTransform_[0].translation_ = { 0,10,50 };
 	debugText_ = DebugText::GetInstance();
 
+	// ボスバレットの初期化
+	bullet = std::make_unique<BossBullet>();
 
 	// 子の座標設定
 
@@ -70,19 +70,19 @@ void BossPhase_1::Update()
 		else if (input_->PushKey(DIK_LEFT)) { worldTransform_[0].translation_.x -= 1.0f; }
 	}
 
-	FlyBlocks({ 0,0,10 });
+	for (int i = 0; i < 27; i++) {
+		affine::makeAffine(worldTransform_[i]);
+	}
+
+	// ランダムに選ばれたブロックが消えたら弾の処理を開始
+	FlyBlocks({ 0,0,0 });
 
 	// 行列の更新と転送
 	for (int i = 0; i < 27; i++) {
 		affine::makeAffine(worldTransform_[i]);
-	}
-	for (int i = 1; i < 27; i++) {
-		if (RespawnFlag[i] == false)
-		{
+		if (i != 0) {
 			worldTransform_[i].matWorld_ *= worldTransform_[0].matWorld_;
 		}
-	}
-	for (int i = 0; i < 27; i++) {
 		worldTransform_[i].TransferMatrix();
 	}
 }
@@ -90,79 +90,54 @@ void BossPhase_1::Update()
 void BossPhase_1::Draw(ViewProjection viewprojection)
 {
 	for (int i = 0; i < 27; i++) {
-		if (RespawnFlag[i] == false)
+		if (AnnihilationFlag[i] == false)
 		{
 			model_->Draw(worldTransform_[i], viewprojection);
 		}
+	}
 
+	// 発射開始したら弾の描画をする
+	if (AnnihilationFlag[randomBlock] == true && bullet->GetToPlayerFlag() == false) {
+		bullet->Draw(viewprojection);
 	}
 }
 
 void BossPhase_1::FlyBlocks(Vector3 playerPos)
 {
+	// ランダムに抽選を行う
 	FloatRandomBlocks();
-	
 
-	// プラスフラグ
-	if (FloatBlockFlagP == true && FloatXRimitFlag == false) {
-		worldTransform_[randomBlock].translation_.x += 0.1f;
-
-		if (worldTransform_[randomBlock].translation_.x >= oldPos.x + 10.0f) {
-			// 制限に移動したらフラグをオン
-			FloatXRimitFlag = true;
-			//お試しリスポーン
-			flyToPlayerFlag = true;
-			worldTransform_[randomBlock].translation_.x = oldPos.x + 10.0f;
-			
-
-			// プレイヤーに向かうベクトルの計算
-			velocity.x = playerPos.x - worldTransform_[randomBlock].translation_.x;
-			velocity.y = playerPos.y - worldTransform_[randomBlock].translation_.y;
-			velocity.z = playerPos.z - worldTransform_[randomBlock].translation_.z;
-
-			velocity.normalize();
-			velocity *= 0.1f;
-		}
+	// 発射開始したら弾の更新を行う
+	if (AnnihilationFlag[randomBlock] == true) {
+		bullet->Update(playerPos);
+		// スケールを小さくする
+		worldTransform_[randomBlock].scale_ = { 0.0f,0.0f,0.0f };
 	}
 
+	
+	// 弾がプレイヤーの位置に行ったら
+	if (bullet->GetToPlayerFlag() == true) {
+		// 徐々に元のものを拡大して再生させる
+		expansionScale += expansionScaleSpeed;
 
-	// マイナスフラグ
-	if (FloatBlockFlagM == true && FloatXRimitFlag == false) {
-		worldTransform_[randomBlock].translation_.x -= 0.1f;
+		worldTransform_[randomBlock].scale_.x = min(expansionScale.x, 1);
+		worldTransform_[randomBlock].scale_.y = min(expansionScale.y, 1);
+		worldTransform_[randomBlock].scale_.z = min(expansionScale.z, 1);
 
-		if (worldTransform_[randomBlock].translation_.x <= oldPos.x - 10.0f) {
-			// 制限に移動したらフラグをオン
-			FloatXRimitFlag = true;
-			//お試しリスポーン
-			flyToPlayerFlag = true;
-			worldTransform_[randomBlock].translation_.x = oldPos.x - 10.0f;
-			
+		AnnihilationFlag[randomBlock] = false;
+		bullet->SetPos(worldTransform_[0].translation_ + oldPos);
 
-			// プレイヤーに向かうベクトルの計算
-			velocity.x = playerPos.x - worldTransform_[randomBlock].translation_.x;
-			velocity.y = playerPos.y - worldTransform_[randomBlock].translation_.y;
-			velocity.z = playerPos.z - worldTransform_[randomBlock].translation_.z;
+	}
+	else
+	{
+		expansionScale = { 0,0,0 };
+	}
 
-			velocity.normalize();
-			velocity *= 0.1f;
-		}
+	// 元のものがスケール元に戻ったらリセットをする
+	if (worldTransform_[randomBlock].scale_.x >= 1.0f) {
+		ResetFlyBlocks();
 	}
 	
-	// プレイヤーに向かって飛ぶ処理
-	if (flyToPlayerFlag == true) {
-		// 回転しながら飛んでいく
-		worldTransform_[randomBlock].rotation_.z += 0.2f;
-
-		// プレイヤーに向かって飛ぶ
-		worldTransform_[randomBlock].translation_ += velocity;
-
-		if (worldTransform_[randomBlock].translation_.y < playerPos.y) {
-			flyToPlayerFlag = false;
-			RespawnFlag[randomBlock] = true;
-		}
-	}
-	debugText_->SetPos(20, 60);
-	debugText_->Printf("飛ぶやつ:%f,%f,%f", worldTransform_[randomBlock].translation_.x, worldTransform_[randomBlock].translation_.y, worldTransform_[randomBlock].translation_.z);
 
 }
 
@@ -172,14 +147,27 @@ void BossPhase_1::FloatRandomBlocks()
 	while (randomBlock == 0 || randomBlock == 2 || randomBlock == 11 || randomBlock == 20 || randomBlock == 6 || randomBlock == 15 || randomBlock == 24) {
 		randomBlock = rand() % 26 + 1;
 		oldPos = worldTransform_[randomBlock].translation_;
+		// 弾の登録
+		bullet->Initialize(model_, worldTransform_[randomBlock], worldTransform_[0].translation_);
 	}
 
 	// 再抽選が終わったら
-	if (worldTransform_[randomBlock].translation_.x > worldTransform_[0].translation_.x && FloatBlockFlagP == false) {
-		FloatBlockFlagP = true;
-	}
-	else if (worldTransform_[randomBlock].translation_.x < worldTransform_[0].translation_.x && FloatBlockFlagM == false) {
-		FloatBlockFlagM = true;
+	if (worldTransform_[randomBlock].translation_.x > worldTransform_[0].translation_.x ||
+		worldTransform_[randomBlock].translation_.x < worldTransform_[0].translation_.x) 
+	{
+		AnnihilationFlag[randomBlock] = true;
 	}
 
+}
+
+// 浮くブロックに関する初期化の処理
+void BossPhase_1::ResetFlyBlocks()
+{
+	randomBlock = 0;
+	FloatBlockFlagM = false;
+	FloatBlockFlagP = false;
+	for (int i = 0; i < 27; i++) {
+		// 元になるものを消すフラグのリセット
+		AnnihilationFlag[i] = false;
+	}
 }

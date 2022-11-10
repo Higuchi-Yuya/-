@@ -6,6 +6,8 @@
 #include "Input.h"
 #include "DebugText.h"
 #include <cassert>
+#include "BossBullet.h"
+
 class BossPhase_1
 {
 public:// メンバ関数
@@ -18,22 +20,27 @@ public:// メンバ関数
 	// 描画処理
 	void Draw(ViewProjection viewprojection);
 
+private:// 静的メンバ関数
+
 	// ブロックを飛ばす処理
 	void FlyBlocks(Vector3 playerPos);
 
 	// ブロックをランダムに抽選して浮かせる処理
 	void FloatRandomBlocks();
 
+	// 弾を打つ関連の初期化
+	void ResetFlyBlocks();
+
 private:// メンバ変数
 
 	//ワールド変換データ
 	WorldTransform worldTransform_[27];
 
-	// 消すときのフラグ
-	bool RespawnFlag[27];
-
+	// デバッグテキスト
 	DebugText* debugText_ = nullptr;
 
+	// インプット
+	Input* input_ = nullptr;
 
 	//モデル
 	Model* model_ = nullptr;
@@ -41,30 +48,31 @@ private:// メンバ変数
 	//デスフラグ
 	bool isDead_ = false;
 
-	// インプット
-	Input* input_ = nullptr;
+	// 消すときのフラグ
+	bool AnnihilationFlag[27];
+
+	// 弾だったものをもう一度出すフラグ
+	bool RespawnFlag[27];
 
 	// ランダムにとるための変数
 	int randomBlock = 0;
 
-	// 再抽選するフラグ
-	bool ReLotteryFlag = true;
-
 	// ブロックを浮かし終わるまでのフラグ
 	bool FloatBlockFlagM = false; // 座標をマイナス
 	bool FloatBlockFlagP = false; // 座標をプラス
-	bool FloatXRimitFlag = false; // 横に出すときの制限フラグ
+	
+	// 
 
 	// ブロックを動かす前の位置
 	Vector3 oldPos;
 
-	// 飛ばしたブロックのリスポーンフラグ
-	bool randomRespawnFlag = false;
+	// ボスバレット
+	std::unique_ptr<BossBullet> bullet;
 
-	// 飛ばしたブロックプレイヤーに向かって回転するフラグ
-	bool flyToPlayerFlag = false;
+	// 徐々に拡大する時のスケール
+	Vector3 expansionScale;
 
-	// ベクトル
-	Vector3 velocity;
+	// 徐々に拡大するときのスピード
+	Vector3 expansionScaleSpeed = { 0.05f,0.05f,0.05f };
 };
 
