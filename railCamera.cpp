@@ -16,20 +16,6 @@ void RailCamera::Initialize(Vector3 trans, Vector3 rot,const WorldTransform* wor
 	worldTransform_.parent_ = worldTransform;
 }
 void RailCamera::Update() {
-	//ƒvƒŒƒCƒ„[ù‰ñˆ—
-	Vector3 rot = { 0,0,0 };
-	Vector3 move = { 0,0,0 };
-	if (input_->PushKey(DIK_Z))
-	{
-		move.z = 0.1;
-	}
-	if (input_->PushKey(DIK_X))
-	{
-		move.z = -0.1;
-	}
-
-	worldTransform_.translation_ += move;
-	worldTransform_.rotation_.y += rot.y * (180 / PI);
 
 	affine::makeMatIdentity(worldTransform_.matWorld_);
 	affine::makeMatRot(worldTransform_.matWorld_, worldTransform_.rotation_);

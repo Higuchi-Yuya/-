@@ -30,6 +30,11 @@ public:
 	///</summary>
 	void Attack();
 
+	///<summary>
+	///ジャンプ
+	///</summary>
+	void jump();
+
 	/// <summary>
 	/// 描画
 	/// </summary>
@@ -71,5 +76,10 @@ private:
 
 	//2Dレティクル用スプライト
 	std::unique_ptr<Sprite> sprite2DReticle_;
+
+	uint8_t jumpFlag = 0u;
+
+	float gravitySpeed = 1.5;
+	float defGravitySpeed = gravitySpeed;
 };
 
