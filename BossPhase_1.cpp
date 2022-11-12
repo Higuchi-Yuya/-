@@ -60,7 +60,7 @@ void BossPhase_1::Initialize(Model* model)
 	}
 }
 
-void BossPhase_1::Update()
+void BossPhase_1::Update(Vector3 playerPos)
 {
 	// キューブの移動
 	if (input_->PushKey(DIK_UP) || input_->PushKey(DIK_DOWN) || input_->PushKey(DIK_RIGHT) || input_->PushKey(DIK_LEFT)) {
@@ -70,21 +70,31 @@ void BossPhase_1::Update()
 		else if (input_->PushKey(DIK_LEFT)) { worldTransform_[0].translation_.x -= 1.0f; }
 	}
 
-	for (int i = 0; i < 27; i++) {
-		affine::makeAffine(worldTransform_[i]);
-	}
+	// 打つ方向に向けてオブジェクトを回転させる
+	Vector3 velocity = playerPos - worldTransform_[0].translation_;
+	velocity.normalize();
+	// Y軸周り角度(θy)
+	worldTransform_[0].rotation_.y = std::atan2(velocity.x, velocity.z);
+	// Y軸周りに-θy回す回転行列を計算
+	Matrix4 RotY;
+	affine::makeMatRotY(RotY, -worldTransform_[0].rotation_.y);// rotateY(RotY, -worldTransform_[0].rotation_.y);
+	// velosity_に回転行列を掛け算してvelosityZを求める
+	Vector3 velosityZ = velocity;
+	velosityZ = affine::MatVector(RotY, velosityZ); //trans->Vec3conversion_W_Notincluded(velosityZ, RotY);
 
-	// ランダムに選ばれたブロックが消えたら弾の処理を開始
-	FlyBlocks({ 0,0,0 });
+	// X軸周り角度(θx)
+	worldTransform_[0].rotation_.x = std::atan2(-velosityZ.y, velosityZ.z);
+
+	rotaAngle = worldTransform_[0].rotation_;
 
 	// 行列の更新と転送
-	for (int i = 0; i < 27; i++) {
-		affine::makeAffine(worldTransform_[i]);
-		if (i != 0) {
-			worldTransform_[i].matWorld_ *= worldTransform_[0].matWorld_;
-		}
-		worldTransform_[i].TransferMatrix();
-	}
+	TransferMat();
+
+	// ランダムに選ばれたブロックが消えたら弾の処理を開始
+	FlyBlocks(playerPos);
+
+	// 行列の更新と転送
+	TransferMat();
 }
 
 void BossPhase_1::Draw(ViewProjection viewprojection)
@@ -148,7 +158,7 @@ void BossPhase_1::FloatRandomBlocks()
 		randomBlock = rand() % 26 + 1;
 		oldPos = worldTransform_[randomBlock].translation_;
 		// 弾の登録
-		bullet->Initialize(model_, worldTransform_[randomBlock], worldTransform_[0].translation_);
+		bullet->Initialize(model_, worldTransform_[randomBlock], worldTransform_[0].translation_,rotaAngle);
 	}
 
 	// 再抽選が終わったら
@@ -169,5 +179,16 @@ void BossPhase_1::ResetFlyBlocks()
 	for (int i = 0; i < 27; i++) {
 		// 元になるものを消すフラグのリセット
 		AnnihilationFlag[i] = false;
+	}
+}
+
+void BossPhase_1::TransferMat()
+{
+	for (int i = 0; i < 27; i++) {
+		affine::makeAffine(worldTransform_[i]);
+		if (i != 0) {
+			worldTransform_[i].matWorld_ *= worldTransform_[0].matWorld_;
+		}
+		worldTransform_[i].TransferMatrix();
 	}
 }

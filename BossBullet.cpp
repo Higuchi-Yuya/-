@@ -1,6 +1,6 @@
 #include "BossBullet.h"
 
-void BossBullet::Initialize(Model* model, const WorldTransform worldTransform, const Vector3& OyaPos)
+void BossBullet::Initialize(Model* model, const WorldTransform worldTransform, const Vector3& OyaPos, const Vector3& rotaAngle)
 {
 	// NULLポインタチェック
 	assert(model);
@@ -13,11 +13,11 @@ void BossBullet::Initialize(Model* model, const WorldTransform worldTransform, c
 
 	//ワールドトランスフォームの初期化
 	worldTransform_.Initialize();
-	worldTransform_.translation_.x = oyaPos.x + worldTransform.translation_.x;
-	worldTransform_.translation_.y = oyaPos.y + worldTransform.translation_.y;
-	worldTransform_.translation_.z = oyaPos.z + worldTransform.translation_.z;
+	worldTransform_.translation_.x =worldTransform.matWorld_.m[3][0];
+	worldTransform_.translation_.y =worldTransform.matWorld_.m[3][1];
+	worldTransform_.translation_.z =worldTransform.matWorld_.m[3][2];
 
-	worldTransform_.rotation_ = worldTransform.rotation_;
+	worldTransform_.rotation_ = rotaAngle;
 
 	debugText_ = DebugText::GetInstance();
 
@@ -114,10 +114,17 @@ void BossBullet::FlyBlocks(Vector3 playerPos)
 			// プレイヤーに向かって飛ぶ
 			worldTransform_.translation_ += velocity_;
 
-			if (worldTransform_.translation_.y <= playerPos.y) {
+			// デスタイマーの加算
+			deathTimer_++;
+
+			if (worldTransform_.translation_.y <= 0.0f ||
+				worldTransform_.translation_.y >= 30.0f||
+				deathTimer_>=kLifeTime) {
 				flyToPlayerFlag = false;
 				ToPlayerFlag_ = true;
+				deathTimer_ = 0;
 			}
+			
 		}
 	}
 	

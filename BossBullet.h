@@ -9,7 +9,7 @@ class BossBullet
 {
 public:
 	// 初期化
-	void Initialize(Model* model, const WorldTransform worldTransform,const Vector3& OyaPos);
+	void Initialize(Model* model, const WorldTransform worldTransform,const Vector3& OyaPos, const Vector3& rotaAngle);
 
 	// 更新処理
 	void Update(const Vector3& playerPos);
@@ -47,10 +47,10 @@ private:
 	Vector3 velocity_;
 
 	//寿命<frm>
-	static const int32_t kLifeTime = 60 * 10;
+	static const int32_t kLifeTime = 60 * 3;
 
 	//デスタイマー
-	int32_t deathTimer_ = kLifeTime;
+	int32_t deathTimer_ = 0;
 
 	//デスフラグ
 	bool isDead_ = false;

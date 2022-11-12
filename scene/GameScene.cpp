@@ -46,7 +46,7 @@ void GameScene::Update() {
 	railCamera_->Update();
 
 	// ボスのフェーズ1の更新
-	bossPhase_1->Update();
+	bossPhase_1->Update(player_->GetworldPosition());
 	// ボスのフェーズ3の更新
 	bossPhase_3->Update();
 }

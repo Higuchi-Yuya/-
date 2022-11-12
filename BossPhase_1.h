@@ -15,7 +15,7 @@ public:// メンバ関数
 	void Initialize(Model* model);
 
 	// 更新処理
-	void Update();
+	void Update(Vector3 playerPos);
 
 	// 描画処理
 	void Draw(ViewProjection viewprojection);
@@ -30,6 +30,9 @@ private:// 静的メンバ関数
 
 	// 弾を打つ関連の初期化
 	void ResetFlyBlocks();
+
+	// 行列の転送と更新
+	void TransferMat();
 
 private:// メンバ変数
 
@@ -61,7 +64,8 @@ private:// メンバ変数
 	bool FloatBlockFlagM = false; // 座標をマイナス
 	bool FloatBlockFlagP = false; // 座標をプラス
 	
-	// 
+	// 押し出すときの角度
+	Vector3 rotaAngle;
 
 	// ブロックを動かす前の位置
 	Vector3 oldPos;

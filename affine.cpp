@@ -56,6 +56,23 @@ void affine::makeMatRot(Matrix4& matrix, Vector3 rot)
 	matrix *= matRot;
 }
 
+void affine::makeMatRotY(Matrix4& matrix, float frequency_y)
+{
+	// Yの回転
+	float sin = std::sin(frequency_y);
+	float cos = std::cos(frequency_y);
+
+	Matrix4 result
+	{
+		cos , 0.0f, -sin, 0.0f,
+		0.0f, 1.0f, 0.0f, 0.0f,
+		sin , 0.0f, cos , 0.0f,
+		0.0f, 0.0f, 0.0f, 1.0f
+	};
+
+	matrix = result;
+}
+
 //アフィン変換平行移動
 void affine::makeMatTrans(Matrix4& matrix, Vector3 trans)
 {

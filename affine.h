@@ -18,6 +18,9 @@ namespace affine
 	//アフィン変換回転
 	void makeMatRot(Matrix4& matrix, Vector3 rot);
 
+	// アフィン変換Y軸
+	void makeMatRotY(Matrix4& matrix, float frequency_y);
+
 	//アフィン変換平行移動
 	void makeMatTrans(Matrix4& matrix, Vector3 Trans);
 
