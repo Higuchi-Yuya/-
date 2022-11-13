@@ -27,7 +27,7 @@ void GameScene::Initialize() {
 	worldTransform.TransferMatrix();
 
 	bossPhase_1 = std::make_unique<BossPhase_1>();
-	bossPhase_1->Initialize(model_);
+	bossPhase_1->Initialize();
 	bossPhase_3 = std::make_unique<BossPhase_3>();
 	bossPhase_3->Initialize();
 	

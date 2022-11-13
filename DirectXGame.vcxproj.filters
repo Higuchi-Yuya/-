@@ -105,6 +105,9 @@
     <ClCompile Include="BossBullet.cpp">
       <Filter>ソース ファイル\Boss</Filter>
     </ClCompile>
+    <ClCompile Include="BossBoomerang.cpp">
+      <Filter>ソース ファイル\Boss</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="3d\ViewProjection.h">
@@ -222,6 +225,9 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="BossBullet.h">
+      <Filter>ヘッダー ファイル\Boss</Filter>
+    </ClInclude>
+    <ClInclude Include="BossBoomerang.h">
       <Filter>ヘッダー ファイル\Boss</Filter>
     </ClInclude>
   </ItemGroup>

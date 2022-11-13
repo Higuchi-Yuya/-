@@ -10,9 +10,10 @@
 
 class BossPhase_1
 {
+
 public:// ƒƒ“ƒoŠÖ”
 	// ‰Šú‰»ŠÖ”
-	void Initialize(Model* model);
+	void Initialize();
 
 	// XVˆ—
 	void Update(Vector3 playerPos);

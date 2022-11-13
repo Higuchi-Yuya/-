@@ -102,6 +102,7 @@
     <ClCompile Include="base\DirectXCommon.cpp" />
     <ClCompile Include="base\TextureManager.cpp" />
     <ClCompile Include="base\WinApp.cpp" />
+    <ClCompile Include="BossBoomerang.cpp" />
     <ClCompile Include="BossBullet.cpp" />
     <ClCompile Include="BossManager.cpp" />
     <ClCompile Include="BossPhase_1.cpp" />
@@ -139,6 +140,7 @@
     <ClInclude Include="base\SafeDelete.h" />
     <ClInclude Include="base\TextureManager.h" />
     <ClInclude Include="base\WinApp.h" />
+    <ClInclude Include="BossBoomerang.h" />
     <ClInclude Include="BossBullet.h" />
     <ClInclude Include="BossManager.h" />
     <ClInclude Include="BossPhase_1.h" />

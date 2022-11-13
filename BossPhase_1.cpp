@@ -1,8 +1,7 @@
 #include "BossPhase_1.h"
 
-void BossPhase_1::Initialize(Model* model)
+void BossPhase_1::Initialize()
 {
-	assert(model);
 
 	input_ = Input::GetInstance();
 
