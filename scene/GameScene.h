@@ -14,6 +14,7 @@
 #include"railCamera.h"
 #include"sky.h"
 #include "BossPhase_1.h"
+#include "BossPhase_2.h"
 #include "BossPhase_3.h"
 #include<sstream>
 
@@ -61,6 +62,7 @@ class GameScene {
 	Model* model_ = nullptr;
 	WorldTransform worldTransform;
 	std::unique_ptr<BossPhase_1> bossPhase_1;
+	std::unique_ptr<BossPhase_2> bossPhase_2;
 	std::unique_ptr<BossPhase_3> bossPhase_3;
 
 	//テクスチャハンドル

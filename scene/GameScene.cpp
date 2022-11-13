@@ -28,6 +28,8 @@ void GameScene::Initialize() {
 
 	bossPhase_1 = std::make_unique<BossPhase_1>();
 	bossPhase_1->Initialize();
+	bossPhase_2= std::make_unique<BossPhase_2>();
+	bossPhase_2->Initialize();
 	bossPhase_3 = std::make_unique<BossPhase_3>();
 	bossPhase_3->Initialize();
 	
@@ -47,6 +49,10 @@ void GameScene::Update() {
 
 	// ボスのフェーズ1の更新
 	bossPhase_1->Update(player_->GetworldPosition());
+
+	// ボスのフェーズ2の更新
+	bossPhase_2->Update(player_->GetworldPosition());
+
 	// ボスのフェーズ3の更新
 	bossPhase_3->Update();
 }
@@ -79,8 +85,12 @@ void GameScene::Draw() {
 	model_->Draw(worldTransform,railCamera_->GetViewProjection());
 	player_->Draw(railCamera_->GetViewProjection());
 
-	// ボスフェーズ１の描画
+	// ボスフェーズ1の描画
 	bossPhase_1->Draw(railCamera_->GetViewProjection());
+
+	// ボスフェーズ2の描画
+	bossPhase_2->Draw(railCamera_->GetViewProjection());
+
 	// ボスフェーズ3の描画
 	bossPhase_3->Draw(railCamera_->GetViewProjection());
 

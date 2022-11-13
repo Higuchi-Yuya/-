@@ -12,6 +12,7 @@ class BossPhase_2
 
 public:// サブクラス
 	enum class Motion {
+		standby,
 		beam,
 		boomerang,
 		rush,
@@ -32,6 +33,8 @@ private:
 
 	void boomerangUpdate(Vector3 playerPos);
 
+	// 行列の転送と更新
+	void TransferMat();
 private:// メンバ変数
 	//ワールド変換データ
 	WorldTransform worldTransform_[19];
