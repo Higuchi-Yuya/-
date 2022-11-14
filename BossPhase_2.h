@@ -9,7 +9,6 @@
 
 class BossPhase_2
 {
-
 public:// サブクラス
 	enum class Motion {
 		standby,
@@ -18,6 +17,7 @@ public:// サブクラス
 		rush,
 		reflector,
 	};
+
 public:// メンバ関数
 	// 初期化関数
 	void Initialize();
@@ -35,6 +35,7 @@ private:
 
 	// 行列の転送と更新
 	void TransferMat();
+
 private:// メンバ変数
 	//ワールド変換データ
 	WorldTransform worldTransform_[19];
@@ -48,6 +49,21 @@ private:// メンバ変数
 	//モデル
 	Model* model_ = nullptr;
 
+	// ビーム用の変数
+	#pragma region ビーム用の変数
+	// ビームのワールドデータ
+	WorldTransform beamWorldTransform_;
+	// ビームのモデル
+	Model* beamModel_ = nullptr;
+
+	bool beamFlag = false;
+	int beamTimer = 0;
+	int beamTimeInterval = 8 * 60;
+
+
+	#pragma endregion
+
+	
 
 };
 

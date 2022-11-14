@@ -40,6 +40,11 @@ void BossPhase_2::Initialize()
 	worldTransform_[16].translation_ = { -2,-2, 0 };
 	worldTransform_[17].translation_ = { 0,-2,+2 };
 	worldTransform_[18].translation_ = { +2,-2, 0 };
+
+	// Žq
+	for (int i = 1; i < 19; i++) {
+		worldTransform_[i].parent_ = &worldTransform_[0];
+	}
 }
 
 void BossPhase_2::Update(Vector3 playerPos)
@@ -56,6 +61,7 @@ void BossPhase_2::Draw(ViewProjection viewprojection)
 
 void BossPhase_2::beamUpdate(Vector3 playerPos)
 {
+
 }
 
 void BossPhase_2::boomerangUpdate(Vector3 playerPos)
