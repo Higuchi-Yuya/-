@@ -170,7 +170,7 @@ void player::jump()
 	if (jumpFlag == 1)
 	{
 		worldTransform_.translation_.y += gravitySpeed;
-		gravitySpeed -= 0.05f;
+		gravitySpeed -= 0.06f;
 
 		if (gravitySpeed <= 0)
 		{
@@ -182,7 +182,7 @@ void player::jump()
 	if (jumpFlag == 2)
 	{
 		worldTransform_.translation_.y -= gravitySpeed;
-		gravitySpeed += 0.04f;
+		gravitySpeed += 0.06f;
 
 		if (gravitySpeed >= defGravitySpeed)
 		{

@@ -25,6 +25,15 @@ Vector3& Vector3::operator*(float s)
 	return temp;
 }
 
+Vector3& Vector3::operator+(float s)
+{
+	Vector3 temp(*this);
+	temp.x += s;
+	temp.y += s;
+	temp.z += s;
+	return temp;
+}
+
 Vector3& Vector3::operator*(const Matrix4& m) {
 	Vector3 temp(*this);
 

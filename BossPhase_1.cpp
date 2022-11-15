@@ -69,22 +69,10 @@ void BossPhase_1::Update(Vector3 playerPos)
 		else if (input_->PushKey(DIK_LEFT)) { worldTransform_[0].translation_.x -= 1.0f; }
 	}
 
-	// 打つ方向に向けてオブジェクトを回転させる
-	Vector3 velocity = playerPos - worldTransform_[0].translation_;
-	velocity.normalize();
-	// Y軸周り角度(θy)
-	worldTransform_[0].rotation_.y = std::atan2(velocity.x, velocity.z);
-	// Y軸周りに-θy回す回転行列を計算
-	Matrix4 RotY;
-	affine::makeMatRotY(RotY, -worldTransform_[0].rotation_.y);// rotateY(RotY, -worldTransform_[0].rotation_.y);
-	// velosity_に回転行列を掛け算してvelosityZを求める
-	Vector3 velosityZ = velocity;
-	velosityZ = affine::MatVector(RotY, velosityZ); //trans->Vec3conversion_W_Notincluded(velosityZ, RotY);
-
-	// X軸周り角度(θx)
-	worldTransform_[0].rotation_.x = std::atan2(-velosityZ.y, velosityZ.z);
+	TurnBodyToPlayer(playerPos);
 
 	rotaAngle = worldTransform_[0].rotation_;
+
 
 	// 行列の更新と転送
 	TransferMat();
@@ -191,3 +179,22 @@ void BossPhase_1::TransferMat()
 		worldTransform_[i].TransferMatrix();
 	}
 }
+
+void BossPhase_1::TurnBodyToPlayer(Vector3 playerPos)
+{
+	// 打つ方向に向けてオブジェクトを回転させる
+	Vector3 velocity = playerPos - worldTransform_[0].translation_;
+	velocity.normalize();
+	// Y軸周り角度(θy)
+	worldTransform_[0].rotation_.y = std::atan2(velocity.x, velocity.z);
+	// Y軸周りに-θy回す回転行列を計算
+	Matrix4 RotY;
+	affine::makeMatRotY(RotY, -worldTransform_[0].rotation_.y);
+	// velosity_に回転行列を掛け算してvelosityZを求める
+	Vector3 velosityZ = velocity;
+	velosityZ = affine::MatVector(RotY, velosityZ);
+
+	// X軸周り角度(θx)
+	worldTransform_[0].rotation_.x = std::atan2(-velosityZ.y, velosityZ.z);
+}
+	

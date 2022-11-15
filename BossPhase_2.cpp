@@ -7,6 +7,7 @@ void BossPhase_2::Initialize()
 	input_ = Input::GetInstance();
 	debugText_ = DebugText::GetInstance();
 	model_ = Model::Create();
+	beamModel_ = Model::Create();
 
 	for (int i = 0; i < 19; i++) {
 
@@ -47,11 +48,17 @@ void BossPhase_2::Initialize()
 	for (int i = 1; i < 19; i++) {
 		worldTransform_[i].parent_ = &worldTransform_[0];
 	}
+
+	beamWorldTransform_.Initialize();
 }
 
 void BossPhase_2::Update(Vector3 playerPos)
 {
 	beamFlag = true;
+	if (beamOBJSetFlag == false) {
+		TurnBodyToPlayer(playerPos);
+	}
+
 	beamUpdate(playerPos);
 
 	TransferMat();
@@ -61,99 +68,108 @@ void BossPhase_2::Draw(ViewProjection viewprojection)
 {
 	for (int i = 0; i < 19; i++) {
 		model_->Draw(worldTransform_[i], viewprojection);
+
 	}
+	// ビームを打ち始めたら描画
+	if (beamSetFlag == true) {
+		beamModel_->Draw(beamWorldTransform_, viewprojection);
+	}
+
 }
 
 void BossPhase_2::beamUpdate(Vector3 playerPos)
 {
 	if (beamFlag == true) {
-		if (beamBlockPosSetFlag == false) {
+		if (beamSetFlag == false) {
 			worldTransform_[10].translation_ = { 0,+2.0f,0 };
 			worldTransform_[1].translation_ = { -2.0f,0,0 };
 			worldTransform_[3].translation_ = { +2.0f,0,0 };
 			worldTransform_[15].translation_ = { 0,-2.0f,0 };
-			beamBlockPosSetFlag = true;
+			beamSetFlag = true;
 		}
 
-		static int timer = 0;
-		static int maxTimer1 = 240;
-		float timerRate1 = min((float)timer / (float)maxTimer1, 1);
-		float timerRate2 = min((float)(timer - maxTimer1) / (float)maxTimer1, 1);
+		// 今の時間
+
+		// どれくらいの間動くかの半分の時間
+
+		float timerRate1 = min((float)beamTimer / (float)maxTimer, 1);
+		float timerRate2 = min((float)(beamTimer - maxTimer) / (float)maxTimer, 1);
 
 		const static float startAngle = DegreeToRad(0);
-		const static float endAngle = DegreeToRad(360 * 4);
+		// 時間内にどれくらい回転をさせるか
+		const static float endAngle = DegreeToRad(360 * 6);
 
 		const float powNum = 3;
 
-		timer++;
-		if (timer <= maxTimer1)
+		beamTimer++;
+
+		if (beamTimer <= maxTimer)
 		{
 			worldTransform_[2].rotation_.z = ((endAngle - startAngle) * powf(timerRate1, powNum) + startAngle) * 2;
+
 		}
 		else
 		{
 			worldTransform_[2].rotation_.z = ((endAngle - startAngle) * (powf(timerRate2 - 1, powNum) + 1) + startAngle) * 2;
 		}
 
+		if (beamTimer < maxStartTimer) {
+			beamToPlayerVel = playerPos - worldTransform_[0].translation_;
+		}
 
-		//worldTransform_[2].rotation_.z += beamRotaSpeedZ;
-		//beamTimer++;
-		//beamRotaTimer++;
-		//if (worldTransform_[2].rotation_.z >= 6.28319) {
-		//	worldTransform_[2].rotation_.z = 0.0f;
-		//}
-		//// 回転をかける時間の上半分の間だけ
-		//if (beamTimer <= beamTimeInterval / 2) {
-		//	// 回転速度を徐々に上げていく
-		//	if (beamRotaTimer >= beamRotaIntervalP) {
-		//		beamRotaTimer = 0;
-		//		beamRotaSpeedZ += 0.01f;
+		// 打ってる時の動作
+		if (beamTimer >= maxStartTimer) {
+			if (beamOBJSetFlag == false) {
+				//beamWorldTransform_.translation_ = worldTransform_[0].translation_;
+				oldPlayerPos = playerPos;
+				// 打つ方向に向けてオブジェクトを回転させる
+				Vector3 velocity = playerPos - worldTransform_[0].translation_;
+				velocity.normalize();
+				beamToPlayerVel = velocity;
+				beamToPlayerVel *= beamSpeed;
 
-		//		// 回転速度がこれ以上上がらないようにする
-		//		if (beamRotaSpeedZ >= 0.5f) {
-		//			beamRotaSpeedZ = 0.5f;
-		//		}
-		//	}
-		//}
-		//else {
-		//	// 回転速度を徐々に落としていく
-		//	if (beamRotaTimer >= beamRotaIntervalM) {
-		//		beamRotaTimer = 0;
-		//		
-		//		if (rotaflag == false) {
-		//			beamRotaSpeedZ -= 0.01f;
-		//			if (beamRotaSpeedZ <= 0.04f) {
-		//				beamRotaSpeedZ = 0.04f;
-		//			}
-		//		}
-		//		
-		//		// ビームの回転速度が 0 以下になったらビームを止める
-		//		// リセットを行う
+				beamOBJSetFlag = true;
+			}
+			TurnBeamToPlayer();
+			beamtoPTimer++;
+			if (beamtoPTimer == beamUpdatePosIntaval) {
+				beamtoPTimer = 0;
+				oldVelocity = playerPos - oldPlayerPos;
+				oldVelocity.normalize();
+				oldVelocity *= 1.0f;
+			}
+			if ((oldPlayerPos.x < playerPos.x - 0.5f || oldPlayerPos.x > playerPos.x + 0.5f) ||
+				(oldPlayerPos.z < playerPos.z - 0.5f || oldPlayerPos.z > playerPos.z + 0.5f)||
+				(oldPlayerPos.y < playerPos.y - 0.5f || oldPlayerPos.y > playerPos.y + 0.5f)) {
+				oldPlayerPos += oldVelocity;
+			}
+			
+			// ビームの長さの固定
+			if (beamWorldTransform_.scale_.z < 80)
+			{
+				beamWorldTransform_.scale_.z += beamSpeed;
+				beamWorldTransform_.matWorld_.m[3][0] += beamToPlayerVel.x;
+				beamWorldTransform_.matWorld_.m[3][1] += beamToPlayerVel.y;
+				beamWorldTransform_.matWorld_.m[3][2] += beamToPlayerVel.z;
+			}
+		}
 
-		//		if (worldTransform_[2].rotation_.z <= 5.0f && beamRotaSpeedZ <= 0.04f) {
-		//			rotaflag = true;
-		//			beamRotaSpeedZ -= 0.01f;
-		//			if (beamRotaSpeedZ <= 0.01f) {
-		//				beamRotaSpeedZ = 0.01f;
-		//			}
-		//		}
-		//		if ((worldTransform_[2].rotation_.z >= 3.12f*2-2 && worldTransform_[2].rotation_.z <= 3.14f*2) && beamRotaSpeedZ <= 0.01f) {
-		//			worldTransform_[2].rotation_.z = 6.28f;
-		//			beamFlag = false;
-		//			beamBlockPosSetFlag = false;
-		//			rotaflag = false;
-		//			beamTimer = 0;
-		//			beamRotaTimer = 0;
-		//			beamRotaSpeedZ = 0.01f;
-		//		}
-		//	}
-		//}
-
+		// うち終わりの処理
+		if (beamTimer >= maxEndTimer) {
+			beamWorldTransform_.scale_.x = (float)easing_Out(1.0f, 0.0f, convergenceTimer, maxConvergenceT);
+			beamWorldTransform_.scale_.y = (float)easing_Out(1.0f, 0.0f, convergenceTimer, maxConvergenceT);
+			convergenceTimer++;
+			if (convergenceTimer >= maxConvergenceT) {
+				convergenceTimer = maxConvergenceT;
+			}
+		}
 	}
-	debugText_->SetPos(20, 120);
-	debugText_->Printf("rotaZ:%f", worldTransform_[2].rotation_.z);
 	debugText_->SetPos(20, 100);
-	debugText_->Printf("time:%d", beamTimer / 60);
+	debugText_->Printf("beamX:%f", beamWorldTransform_.translation_.x);
+	debugText_->SetPos(20, 120);
+	debugText_->Printf("pos:%f", worldTransform_[0].matWorld_.m[3][0]);
+	debugText_->SetPos(20, 140);
+	debugText_->Printf("scale:%f", beamWorldTransform_.scale_.z);
 }
 
 void BossPhase_2::boomerangUpdate(Vector3 playerPos)
@@ -164,7 +180,7 @@ void BossPhase_2::TransferMat()
 {
 	for (int i = 0; i < 19; i++) {
 		affine::makeAffine(worldTransform_[i]);
-
+		affine::makeAffine(beamWorldTransform_);
 		// ビーム打ち始めたら行列の掛け算を調整
 		if (beamFlag == true) {
 			// ビームで使うものを行列計算する
@@ -176,6 +192,9 @@ void BossPhase_2::TransferMat()
 			else if (i != 0) {
 				worldTransform_[i].matWorld_ *= worldTransform_[0].matWorld_;
 			}
+			// ビームオブジェの行列の転送
+
+			beamWorldTransform_.matWorld_ *= worldTransform_[0].matWorld_;
 		}
 		// それ以外の時は基本的に親と行列計算を行う
 		else if (i != 0) {
@@ -185,10 +204,62 @@ void BossPhase_2::TransferMat()
 
 		worldTransform_[i].TransferMatrix();
 	}
+
+	beamWorldTransform_.TransferMatrix();
 }
 
 float BossPhase_2::Lerp(const float& startPos, const float& endPos, const float& timeRate)
 {
 	float dis = endPos - startPos;
 	return dis * timeRate + startPos;
+}
+
+double BossPhase_2::easing_Out(double start, double end, double time, double max_time)
+{
+	time /= max_time;
+	double move = end - start;
+	return start + (move * (1 - (1 - time) * (1 - time)));
+}
+
+void BossPhase_2::TurnBodyToPlayer(Vector3 playerPos)
+{
+	// 打つ方向に向けてオブジェクトを回転させる
+	Vector3 velocity = playerPos - worldTransform_[0].translation_;
+	velocity.normalize();
+
+	// Y軸周り角度(θy)
+	worldTransform_[0].rotation_.y = -std::atan2(velocity.z, velocity.x) - DegreeToRad(90);
+
+	// Y軸周りに-θy回す回転行列を計算
+	Matrix4 RotY;
+	affine::makeMatRotY(RotY, -worldTransform_[0].rotation_.y);
+
+	// velosity_に回転行列を掛け算してvelosityZを求める
+	Vector3 velocityZ = velocity;
+	velocityZ = affine::MatVector(RotY, velocityZ);
+
+	// X軸周り角度(θx)
+	worldTransform_[0].rotation_.x = std::atan2(velocityZ.y, -velocityZ.z);
+}
+
+void BossPhase_2::TurnBeamToPlayer()
+{
+	// 打つ方向に向けてオブジェクトを回転させる
+	Vector3 velocity = oldPlayerPos - worldTransform_[0].translation_;
+	velocity.normalize();
+
+	// Y軸周り角度(θy)
+	worldTransform_[0].rotation_.y = -std::atan2(velocity.z, velocity.x) - DegreeToRad(90);
+	
+	// Y軸周りに-θy回す回転行列を計算
+	Matrix4 RotY;
+	affine::makeMatRotY(RotY, -worldTransform_[0].rotation_.y);
+
+	// velosity_に回転行列を掛け算してvelosityZを求める
+	Vector3 velocityZ = velocity;
+	velocityZ = affine::MatVector(RotY, velocityZ);
+
+	// X軸周り角度(θx)
+	worldTransform_[0].rotation_.x = std::atan2(velocityZ.y, -velocityZ.z);
+	
 }

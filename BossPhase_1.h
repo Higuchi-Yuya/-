@@ -35,6 +35,8 @@ private:// 静的メンバ関数
 	// 行列の転送と更新
 	void TransferMat();
 
+	void TurnBodyToPlayer(Vector3 playerPos);
+
 private:// メンバ変数
 
 	//ワールド変換データ

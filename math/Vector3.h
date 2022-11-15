@@ -29,6 +29,7 @@ class Vector3 {
 	Vector3& operator*=(float s);
 	Vector3& operator/=(float s);
 	Vector3& operator*(float s);
+	Vector3& operator+(float s);
 	Vector3& operator*(const Matrix4& m);
 
 };

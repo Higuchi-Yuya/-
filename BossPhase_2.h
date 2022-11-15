@@ -38,6 +38,9 @@ private:
 
 	float Lerp(const float& startPos, const float& endPos, const float& timeRate);
 
+	double easing_Out(double start, double end, double time, double max_time);
+
+
 	float DegreeToRad(float num)
 	{
 		return num / 180 * MathUtility::PI;
@@ -48,6 +51,9 @@ private:
 		return num / MathUtility::PI * 180;
 	}
 
+	void TurnBodyToPlayer(Vector3 playerPos);
+
+	void TurnBeamToPlayer();
 private:// メンバ変数
 	//ワールド変換データ
 	WorldTransform worldTransform_[19];
@@ -69,18 +75,29 @@ private:// メンバ変数
 	Model* beamModel_ = nullptr;
 
 	bool beamFlag = false;
-	bool beamBlockPosSetFlag = false;
-	bool rotaflag = false;
+	bool beamSetFlag = false;
+	bool beamOBJSetFlag = false;
 	int beamTimer = 0;
-	int beamTimeInterval = 8 * 60;
-
-	int beamRotaTimer = 0;
-	int beamRotaIntervalP = 10;
-	int beamRotaIntervalM = 5;
-
-	float beamRotaSpeedZ = 0.01f;
-	float beamRotaSpeedZ_2 = 0.01f;
-
+	int beamtoPTimer = 0;
+	// 半分の時間
+	int maxTimer = 6 * 60;
+	// ビーム開始の時間
+	int maxStartTimer = 3 * 60;
+	// ビーム収束開始の時間
+	int maxEndTimer = 7 * 60;
+	// ポジション更新する間隔
+	int beamUpdatePosIntaval = 0.3 * 60;
+	// 収束時間
+	int convergenceTimer = 0;
+	int maxConvergenceT = 5 * 60;
+	
+	Vector3 oldPlayerPos;
+	Vector3 oldPlayerPos2;
+	Vector3 oldVelocity;
+	Vector3 beamToPlayerVel;
+	Vector3 beamToPlayerVelUp;
+	Vector3 beamLength;
+	float beamSpeed = 1.0f;
 	#pragma endregion
 
 	
