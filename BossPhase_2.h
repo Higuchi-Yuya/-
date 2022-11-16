@@ -31,7 +31,7 @@ public:// メンバ関数
 private:
 	void beamUpdate(Vector3 playerPos);
 
-	void boomerangUpdate(Vector3 playerPos);
+	void boomerangUpdate();
 
 	void rushUpdate(Vector3 playerPos);
 
@@ -59,6 +59,9 @@ private:
 	void TurnBodyToPlayer(Vector3 playerPos);
 
 	void TurnBeamToPlayer();
+
+	//ブーメラン関連のセット
+	void  boomerangSet(Vector3 playerPos);
 
 private:// メンバ変数
 	//ワールド変換データ
@@ -124,6 +127,35 @@ private:// メンバ変数
 #pragma endregion
 
 #pragma region ブーメラン用変数
+
+	// 消すときのフラグ
+	bool AnnihilationFlag[27];
+
+	//上のブーメラン用ワールドトランスフォーム
+	WorldTransform upBoomerangWorldTransform[5];
+
+	float upAngle = 0;
+
+	Vector3 upVector;
+
+	bool isUpActive = false;
+
+	bool isUpAttack = false;
+
+	bool isUpDirectionRight=false;
+
+	//下のブーメランようワールドトランスフォーム
+	WorldTransform downBoomerangWorldTransform[5];
+
+	float downAngle = 0;
+
+	Vector3 downVector;
+
+	bool isDownActive = false;
+
+	bool isDownAttack = false;
+
+	bool isDownDirectionRight=false;
 
 #pragma endregion
 

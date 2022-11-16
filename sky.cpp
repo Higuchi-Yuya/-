@@ -3,7 +3,7 @@
 #include"affine.h"
 void sky::Initialize() {
 
-	model_ = Model::CreateFromOBJ("skydome",true);
+	model_ = Model::CreateFromOBJ("test",true);
 	worldTransform_.Initialize();
 
 	worldTransform_.scale_ = { 100.0f,100.0f,100.0f };
