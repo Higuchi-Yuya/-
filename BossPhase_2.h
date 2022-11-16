@@ -105,7 +105,21 @@ private:// メンバ変数
 	float beamSpeed = 1.0f;
 	#pragma endregion
 
-	
+#pragma region 移動用変数
+
+	float angle = 90;
+
+	float radius = 50;
+
+#pragma endregion
+
+#pragma region ブーメラン用変数
+
+#pragma endregion
+
+#pragma region 突進用変数
+
+#pragma endregion
 
 };
 

@@ -54,6 +54,17 @@ void BossPhase_2::Initialize()
 
 void BossPhase_2::Update(Vector3 playerPos)
 {
+
+	angle += 0.9;
+	if (angle >= 360)
+	{
+		angle = 0;
+	}
+
+
+	worldTransform_[0].translation_.x = 50 * cos(angle * affine::Deg2Rad);
+	worldTransform_[0].translation_.z = 50 * sin(angle * affine::Deg2Rad);
+
 	if (input_->TriggerKey(DIK_1))
 	{
 		beamReset();
