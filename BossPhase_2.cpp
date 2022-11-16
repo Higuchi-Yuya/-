@@ -54,7 +54,11 @@ void BossPhase_2::Initialize()
 
 void BossPhase_2::Update(Vector3 playerPos)
 {
-	beamFlag = true;
+	if (input_->TriggerKey(DIK_1))
+	{
+		beamReset();
+	}
+	//beamFlag = true;
 	if (beamOBJSetFlag == false) {
 		TurnBodyToPlayer(playerPos);
 	}
@@ -162,6 +166,14 @@ void BossPhase_2::beamUpdate(Vector3 playerPos)
 			if (convergenceTimer >= maxConvergenceT) {
 				convergenceTimer = maxConvergenceT;
 			}
+			if (beamWorldTransform_.scale_.x <= 0.0f) {
+				beamFlag = false;
+				beamOBJSetFlag = false;
+				worldTransform_[1].translation_ = { +2, 0,-2 };
+				worldTransform_[3].translation_ = { -2, 0,-2 };
+				worldTransform_[10].translation_ = { 0,+2,-2 };
+				worldTransform_[15].translation_ = { 0,-2,-2 };
+			}
 		}
 	}
 	debugText_->SetPos(20, 100);
@@ -219,6 +231,27 @@ double BossPhase_2::easing_Out(double start, double end, double time, double max
 	time /= max_time;
 	double move = end - start;
 	return start + (move * (1 - (1 - time) * (1 - time)));
+}
+
+void BossPhase_2::beamReset()
+{
+	beamFlag = true;
+	beamSetFlag = false;
+	beamOBJSetFlag = false;
+
+	beamWorldTransform_.translation_={0.0f,0.0f,0.0f};
+	beamWorldTransform_.scale_ = { 1.0f,1.0f,1.0f };
+	beamWorldTransform_.rotation_ = { 0.0f,0.0f,0.0f };
+
+	worldTransform_[2].rotation_ = { 0.0f,0.0f,0.0f };
+	worldTransform_[1].translation_ = { +2, 0,-2 };
+	worldTransform_[3].translation_ = { -2, 0,-2 };
+	worldTransform_[10].translation_ = { 0,+2,-2 };
+	worldTransform_[15].translation_ = { 0,-2,-2 };
+
+	beamTimer = 0;
+	beamtoPTimer = 0;
+	convergenceTimer = 0;
 }
 
 void BossPhase_2::TurnBodyToPlayer(Vector3 playerPos)

@@ -51,9 +51,13 @@ private:
 		return num / MathUtility::PI * 180;
 	}
 
+	// ビーム関連のリセット
+	void beamReset();
+
 	void TurnBodyToPlayer(Vector3 playerPos);
 
 	void TurnBeamToPlayer();
+
 private:// メンバ変数
 	//ワールド変換データ
 	WorldTransform worldTransform_[19];
@@ -79,17 +83,18 @@ private:// メンバ変数
 	bool beamOBJSetFlag = false;
 	int beamTimer = 0;
 	int beamtoPTimer = 0;
+
 	// 半分の時間
 	int maxTimer = 6 * 60;
 	// ビーム開始の時間
 	int maxStartTimer = 3 * 60;
 	// ビーム収束開始の時間
-	int maxEndTimer = 7 * 60;
+	int maxEndTimer = 6 * 60;
 	// ポジション更新する間隔
 	int beamUpdatePosIntaval = 0.3 * 60;
 	// 収束時間
 	int convergenceTimer = 0;
-	int maxConvergenceT = 5 * 60;
+	int maxConvergenceT = 6 * 60;
 	
 	Vector3 oldPlayerPos;
 	Vector3 oldPlayerPos2;
