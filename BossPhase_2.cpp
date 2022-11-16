@@ -17,32 +17,33 @@ void BossPhase_2::Initialize()
 
 	// 親
 	worldTransform_[0].translation_ = { 50,10,50 };
+	worldTransform_[0].scale_ = { kyubuScale,kyubuScale,kyubuScale };
 
 	// 子の座標設定
 
 	// 真ん中の段
-	worldTransform_[1].translation_ = { +2, 0,-2 };
-	worldTransform_[2].translation_ = { 0, 0,-2 };
-	worldTransform_[3].translation_ = { -2, 0,-2 };
-	worldTransform_[4].translation_ = { -2, 0, 0 };
-	worldTransform_[5].translation_ = { -2, 0,+2 };
-	worldTransform_[6].translation_ = { 0, 0,+2 };
-	worldTransform_[7].translation_ = { +2, 0,+2 };
-	worldTransform_[8].translation_ = { +2, 0, 0 };
+	worldTransform_[1].translation_ = { +kyubuLengh, 0,-kyubuLengh };
+	worldTransform_[2].translation_ = { 0, 0,-kyubuLengh };
+	worldTransform_[3].translation_ = { -kyubuLengh, 0,-kyubuLengh };
+	worldTransform_[4].translation_ = { -kyubuLengh, 0, 0 };
+	worldTransform_[5].translation_ = { -kyubuLengh, 0,+kyubuLengh };
+	worldTransform_[6].translation_ = { 0, 0,+kyubuLengh };
+	worldTransform_[7].translation_ = { +kyubuLengh, 0,+kyubuLengh };
+	worldTransform_[8].translation_ = { +kyubuLengh, 0, 0 };
 
 	// 上の段
-	worldTransform_[9].translation_ = { 0,+2, 0 };
-	worldTransform_[10].translation_ = { 0,+2,-2 };
-	worldTransform_[11].translation_ = { -2,+2, 0 };
-	worldTransform_[12].translation_ = { 0,+2,+2 };
-	worldTransform_[13].translation_ = { +2,+2, 0 };
+	worldTransform_[9].translation_ = { 0,+kyubuLengh, 0 };
+	worldTransform_[10].translation_ = { 0,+kyubuLengh,-kyubuLengh };
+	worldTransform_[11].translation_ = { -kyubuLengh,+kyubuLengh, 0 };
+	worldTransform_[12].translation_ = { 0,+kyubuLengh,+kyubuLengh };
+	worldTransform_[13].translation_ = { +kyubuLengh,+kyubuLengh, 0 };
 
 	// 下の段
-	worldTransform_[14].translation_ = { 0,-2, 0 };
-	worldTransform_[15].translation_ = { 0,-2,-2 };
-	worldTransform_[16].translation_ = { -2,-2, 0 };
-	worldTransform_[17].translation_ = { 0,-2,+2 };
-	worldTransform_[18].translation_ = { +2,-2, 0 };
+	worldTransform_[14].translation_ = { 0,-kyubuLengh, 0 };
+	worldTransform_[15].translation_ = { 0,-kyubuLengh,-kyubuLengh };
+	worldTransform_[16].translation_ = { -kyubuLengh,-kyubuLengh, 0 };
+	worldTransform_[17].translation_ = { 0,-kyubuLengh,+kyubuLengh };
+	worldTransform_[18].translation_ = { +kyubuLengh,-kyubuLengh, 0 };
 
 	// 子
 	for (int i = 1; i < 19; i++) {
@@ -61,7 +62,6 @@ void BossPhase_2::Update(Vector3 playerPos)
 		angle = 0;
 	}
 
-
 	worldTransform_[0].translation_.x = 50 * cos(angle * affine::Deg2Rad);
 	worldTransform_[0].translation_.z = 50 * sin(angle * affine::Deg2Rad);
 
@@ -69,7 +69,7 @@ void BossPhase_2::Update(Vector3 playerPos)
 	{
 		beamReset();
 	}
-	//beamFlag = true;
+
 	if (beamOBJSetFlag == false) {
 		TurnBodyToPlayer(playerPos);
 	}
@@ -96,10 +96,12 @@ void BossPhase_2::beamUpdate(Vector3 playerPos)
 {
 	if (beamFlag == true) {
 		if (beamSetFlag == false) {
-			worldTransform_[10].translation_ = { 0,+2.0f,0 };
-			worldTransform_[1].translation_ = { -2.0f,0,0 };
-			worldTransform_[3].translation_ = { +2.0f,0,0 };
-			worldTransform_[15].translation_ = { 0,-2.0f,0 };
+			beamWorldTransform_.scale_.x = 0.5f;
+			beamWorldTransform_.scale_.y = 0.5f;
+			worldTransform_[10].translation_ = { 0,+kyubuLengh,0 };
+			worldTransform_[1].translation_ = { -kyubuLengh,0,0 };
+			worldTransform_[3].translation_ = { +kyubuLengh,0,0 };
+			worldTransform_[15].translation_ = { 0,-kyubuLengh,0 };
 			beamSetFlag = true;
 		}
 
@@ -171,8 +173,8 @@ void BossPhase_2::beamUpdate(Vector3 playerPos)
 
 		// うち終わりの処理
 		if (beamTimer >= maxEndTimer) {
-			beamWorldTransform_.scale_.x = (float)easing_Out(1.0f, 0.0f, convergenceTimer, maxConvergenceT);
-			beamWorldTransform_.scale_.y = (float)easing_Out(1.0f, 0.0f, convergenceTimer, maxConvergenceT);
+			beamWorldTransform_.scale_.x = (float)easing_Out(0.5f, 0.0f, convergenceTimer, maxConvergenceT);
+			beamWorldTransform_.scale_.y = (float)easing_Out(0.5f, 0.0f, convergenceTimer, maxConvergenceT);
 			convergenceTimer++;
 			if (convergenceTimer >= maxConvergenceT) {
 				convergenceTimer = maxConvergenceT;
@@ -187,6 +189,7 @@ void BossPhase_2::beamUpdate(Vector3 playerPos)
 			}
 		}
 	}
+
 	debugText_->SetPos(20, 100);
 	debugText_->Printf("beamX:%f", beamWorldTransform_.translation_.x);
 	debugText_->SetPos(20, 120);
@@ -199,11 +202,18 @@ void BossPhase_2::boomerangUpdate(Vector3 playerPos)
 {
 }
 
+void BossPhase_2::rushUpdate(Vector3 playerPos)
+{
+
+}
+
 void BossPhase_2::TransferMat()
 {
 	for (int i = 0; i < 19; i++) {
+		
 		affine::makeAffine(worldTransform_[i]);
 		affine::makeAffine(beamWorldTransform_);
+		
 		// ビーム打ち始めたら行列の掛け算を調整
 		if (beamFlag == true) {
 			// ビームで使うものを行列計算する
@@ -223,7 +233,6 @@ void BossPhase_2::TransferMat()
 		else if (i != 0) {
 			worldTransform_[i].matWorld_ *= worldTransform_[0].matWorld_;
 		}
-
 
 		worldTransform_[i].TransferMatrix();
 	}
@@ -255,10 +264,10 @@ void BossPhase_2::beamReset()
 	beamWorldTransform_.rotation_ = { 0.0f,0.0f,0.0f };
 
 	worldTransform_[2].rotation_ = { 0.0f,0.0f,0.0f };
-	worldTransform_[1].translation_ = { +2, 0,-2 };
-	worldTransform_[3].translation_ = { -2, 0,-2 };
-	worldTransform_[10].translation_ = { 0,+2,-2 };
-	worldTransform_[15].translation_ = { 0,-2,-2 };
+	worldTransform_[1].translation_ = { +kyubuLengh, 0,-kyubuLengh };
+	worldTransform_[3].translation_ = { -kyubuLengh, 0,-kyubuLengh };
+	worldTransform_[10].translation_ = { 0,+kyubuLengh,-kyubuLengh };
+	worldTransform_[15].translation_ = { 0,-kyubuLengh,-kyubuLengh };
 
 	beamTimer = 0;
 	beamtoPTimer = 0;

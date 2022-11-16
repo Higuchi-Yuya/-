@@ -33,6 +33,8 @@ private:
 
 	void boomerangUpdate(Vector3 playerPos);
 
+	void rushUpdate(Vector3 playerPos);
+
 	// 行列の転送と更新
 	void TransferMat();
 
@@ -61,6 +63,14 @@ private:
 private:// メンバ変数
 	//ワールド変換データ
 	WorldTransform worldTransform_[19];
+
+	// キューブ用のスケールの変数
+	float kyubuScale = 3.0f;
+	float kyubuLengh = 2.0f;
+
+	// 親の回転要素
+	Vector3 oyaRota;
+	Matrix4 oyaRotation;
 
 	// デバッグテキスト
 	DebugText* debugText_ = nullptr;
