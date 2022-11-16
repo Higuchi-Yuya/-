@@ -20,7 +20,6 @@ void BossPhase_2::Initialize()
 	worldTransform_[0].scale_ = { kyubuScale,kyubuScale,kyubuScale };
 
 	// 子の座標設定
-
 	// 真ん中の段
 	worldTransform_[1].translation_ = { +kyubuLengh, 0,-kyubuLengh };
 	worldTransform_[2].translation_ = { 0, 0,-kyubuLengh };
@@ -108,7 +107,6 @@ void BossPhase_2::beamUpdate(Vector3 playerPos)
 		// 今の時間
 
 		// どれくらいの間動くかの半分の時間
-
 		float timerRate1 = min((float)beamTimer / (float)maxTimer, 1);
 		float timerRate2 = min((float)(beamTimer - maxTimer) / (float)maxTimer, 1);
 

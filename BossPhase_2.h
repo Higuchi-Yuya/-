@@ -128,6 +128,18 @@ private:// メンバ変数
 #pragma endregion
 
 #pragma region 突進用変数
+	// 突進開始用のフラグ
+	bool rushFlag = false;
+	// 下げるときのポジションY
+	float downPosY = 2.0f;
+	// 元の高さを記録する変数
+	float originPosY = 0.0f;
+
+	// 突進時のボスとプレイヤーのベクトル
+	Vector3 rushToPlayer;
+
+	// 押し戻し判定があるかどうかチェックするフラグ
+	bool rushFinsh = false;
 
 #pragma endregion
 
