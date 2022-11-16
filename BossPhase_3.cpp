@@ -74,8 +74,8 @@ void BossPhase_3::Update()
 		affine::makeAffine(worldTransform_[i]);
 		worldTransform_[i].TransferMatrix();
 	}
-	debugText_->SetPos(10, 50);
-	debugText_->Printf("%d,%f", totalMoveX, speedX);
+	/*debugText_->SetPos(10, 50);
+	debugText_->Printf("%d,%f", totalMoveX, speedX);*/
 }
 
 void BossPhase_3::Draw(ViewProjection viewprojection)

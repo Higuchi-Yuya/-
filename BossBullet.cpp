@@ -128,8 +128,8 @@ void BossBullet::FlyBlocks(Vector3 playerPos)
 		}
 	}
 	
-	debugText_->SetPos(20, 60);
-	debugText_->Printf("”ò‚Ô‚â‚Â:%f,%f,%f", worldTransform_.translation_.x, worldTransform_.translation_.y, worldTransform_.translation_.z);
+	/*debugText_->SetPos(20, 60);
+	debugText_->Printf("”ò‚Ô‚â‚Â:%f,%f,%f", worldTransform_.translation_.x, worldTransform_.translation_.y, worldTransform_.translation_.z);*/
 }
 
 void BossBullet::SetToPlayerFlag(bool ToPlayerFlag)

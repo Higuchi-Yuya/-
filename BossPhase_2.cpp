@@ -16,7 +16,7 @@ void BossPhase_2::Initialize()
 	}
 
 	// e
-	worldTransform_[0].translation_ = { 50,10,50 };
+	worldTransform_[0].translation_ = { 100,10,100 };
 	worldTransform_[0].scale_ = { kyubuScale,kyubuScale,kyubuScale };
 
 	// Žq‚ÌÀ•WÝ’è
@@ -73,8 +73,8 @@ void BossPhase_2::Update(Vector3 playerPos)
 
 	angle += 0.9 * affine::Deg2Rad;
 
-	worldTransform_[0].translation_.x = 50 * cos(angle);
-	worldTransform_[0].translation_.z = 50 * sin(angle);
+	worldTransform_[0].translation_.x = 100 * cos(angle);
+	worldTransform_[0].translation_.z = 100 * sin(angle);
 
 	if (input_->TriggerKey(DIK_1))
 	{
@@ -98,16 +98,16 @@ void BossPhase_2::Update(Vector3 playerPos)
 
 void BossPhase_2::Draw(ViewProjection viewprojection)
 {
+	if (isUpActive == true)
+	{
+		for (int i = 0; i < 5; i++) {
+			model_->Draw(upBoomerangWorldTransform[i], viewprojection);
+		}
+	}
 	for (int i = 0; i < 19; i++) {
 		if (AnnihilationFlag[i] == false)
 		{
 			model_->Draw(worldTransform_[i], viewprojection);
-		}
-	}
-	if (isUpAttack==true)
-	{
-		for (int i = 0; i < 5; i++) {
-			model_->Draw(upBoomerangWorldTransform[i], viewprojection);
 		}
 	}
 	if (isDownAttack == true)
@@ -221,12 +221,12 @@ void BossPhase_2::beamUpdate(Vector3 playerPos)
 		}
 	}
 
-	debugText_->SetPos(20, 100);
+	/*debugText_->SetPos(20, 100);
 	debugText_->Printf("beamX:%f", beamWorldTransform_.translation_.x);
 	debugText_->SetPos(20, 120);
 	debugText_->Printf("pos:%f", worldTransform_[0].matWorld_.m[3][0]);
 	debugText_->SetPos(20, 140);
-	debugText_->Printf("scale:%f", beamWorldTransform_.scale_.z);
+	debugText_->Printf("scale:%f", beamWorldTransform_.scale_.z);*/
 }
 
 void BossPhase_2::boomerangUpdate()
@@ -235,7 +235,9 @@ void BossPhase_2::boomerangUpdate()
 	{
 		if (isUpAttack == true)
 		{
-			upBoomerangWorldTransform[0].translation_ += upVector;
+			upBoomerangWorldTransform[0].translation_.x += upVector.x * 2;
+			upBoomerangWorldTransform[0].translation_.y += upVector.y * 5;
+			upBoomerangWorldTransform[0].translation_.z += upVector.z * 2;
 
 			float AR;
 			float BR;
@@ -243,63 +245,41 @@ void BossPhase_2::boomerangUpdate()
 			AR = pow((upBoomerangWorldTransform[0].translation_.x), 2) + pow((upBoomerangWorldTransform[0].translation_.z), 2);
 			BR = pow((100 - upBoomerangWorldTransform[0].scale_.x * 1.5), 2);
 
-			if (AR <= BR)
+			if (AR > BR)
 			{
-				isUpAttack == false;
+				isUpAttack = false;
 
-				float originVectorX = 0 - upBoomerangWorldTransform[0].translation_.x;
-				float originVectorZ = 0 - upBoomerangWorldTransform[0].translation_.z;
+				float originVectorX = upBoomerangWorldTransform[0].translation_.x - 0;
+				float originVectorZ = upBoomerangWorldTransform[0].translation_.z - 0;
 				float Boomerangangle = atan2(originVectorZ, originVectorX);
 
-				upBoomerangWorldTransform[0].translation_.x = 50 * cos(Boomerangangle);
-				upBoomerangWorldTransform[0].translation_.z = 50 * sin(Boomerangangle);
+				/*	upBoomerangWorldTransform[0].translation_.x = 50 * cos(Boomerangangle);
+					upBoomerangWorldTransform[0].translation_.z = 50 * sin(Boomerangangle);*/
 
-				upAngle = Boomerangangle+((int)(angle/3.14)*3.14);
-
-				float bossVectorX = upBoomerangWorldTransform[0].translation_.x - worldTransform_[0].translation_.x;
-				float bossVectorZ = upBoomerangWorldTransform[0].translation_.z - worldTransform_[0].translation_.z;
-
-				float crossProduct = originVectorX * bossVectorZ - originVectorZ * bossVectorX;
-
-				if (crossProduct < 0)
-				{
-					isUpDirectionRight = false;
-
-				}
-				else
-				{
-					isUpDirectionRight = true;
-				}
+				upAngle = Boomerangangle + ((int)(angle / 6.28) * 6.28);
 			}
 		}
 		else
 		{
-			if (isUpDirectionRight == true)
+			upAngle += 1.5 * affine::Deg2Rad;
+			upBoomerangWorldTransform[0].translation_.x = 100 * cos(upAngle);
+			upBoomerangWorldTransform[0].translation_.z = 100 * sin(upAngle);
+			if (angle <= upAngle)
 			{
-				upAngle += 10 * affine::Deg2Rad;
-				upBoomerangWorldTransform[0].translation_.x = 50 * cos(upAngle);
-				upBoomerangWorldTransform[0].translation_.z = 50 * sin(upAngle);
-				if (angle <= upAngle)
-				{
-					isUpActive = false;
+				isUpActive = false;
 
-				}
+				AnnihilationFlag[9] = false;
+				AnnihilationFlag[10] = false;
+				AnnihilationFlag[11] = false;
+				AnnihilationFlag[12] = false;
+				AnnihilationFlag[13] = false;
 			}
-			else
-			{
-				upAngle -= 10 * affine::Deg2Rad;
-				upBoomerangWorldTransform[0].translation_.x = 50 * cos(upAngle);
-				upBoomerangWorldTransform[0].translation_.z = 50 * sin(upAngle);
-				if (angle >= upAngle)
-				{
-					isUpActive = false;
-
-				}
-			}
+			debugText_->SetPos(10, 100);
+			debugText_->Printf("%f,%f", upAngle, angle);
 		}
 		for (int i = 0; i < 5; i++) {
 			affine::makeAffine(upBoomerangWorldTransform[i]);
-			if (i!=0)
+			if (i != 0)
 			{
 				upBoomerangWorldTransform[i].matWorld_ *= upBoomerangWorldTransform[i].parent_->matWorld_;
 			}
@@ -320,16 +300,16 @@ void BossPhase_2::boomerangUpdate()
 				AR = pow((downBoomerangWorldTransform[0].translation_.x), 2) + pow((downBoomerangWorldTransform[0].translation_.z), 2);
 				BR = pow((100 - downBoomerangWorldTransform[0].scale_.x * 1.5), 2);
 
-				if (AR <= BR)
+				if (AR < BR)
 				{
-					isUpAttack == false;
+					isUpAttack = false;
 
 					float originVectorX = downBoomerangWorldTransform[0].translation_.x - 0;
 					float originVectorZ = downBoomerangWorldTransform[0].translation_.z - 0;
 					float Boomerangangle = atan2(originVectorZ, originVectorX);
 
-					downBoomerangWorldTransform[0].translation_.x = 50 * cos(Boomerangangle);
-					downBoomerangWorldTransform[0].translation_.z = 50 * sin(Boomerangangle);
+					downBoomerangWorldTransform[0].translation_.x = 100 * cos(Boomerangangle);
+					downBoomerangWorldTransform[0].translation_.z = 100 * sin(Boomerangangle);
 
 					upAngle = Boomerangangle + ((int)(angle / 3.14) * 3.14);
 
@@ -345,8 +325,8 @@ void BossPhase_2::boomerangUpdate()
 			if (isUpDirectionRight == true)
 			{
 				upAngle += 10 * affine::Deg2Rad;
-				upBoomerangWorldTransform[0].translation_.x = 50 * cos(upAngle);
-				upBoomerangWorldTransform[0].translation_.z = 50 * sin(upAngle);
+				upBoomerangWorldTransform[0].translation_.x = 100 * cos(upAngle);
+				upBoomerangWorldTransform[0].translation_.z = 100 * sin(upAngle);
 				if (angle <= upAngle)
 				{
 					isUpActive = false;
@@ -356,8 +336,8 @@ void BossPhase_2::boomerangUpdate()
 			else
 			{
 				upAngle -= 10 * affine::Deg2Rad;
-				upBoomerangWorldTransform[0].translation_.x = 50 * cos(upAngle);
-				upBoomerangWorldTransform[0].translation_.z = 50 * sin(upAngle);
+				upBoomerangWorldTransform[0].translation_.x = 100 * cos(upAngle);
+				upBoomerangWorldTransform[0].translation_.z = 100 * sin(upAngle);
 				if (angle >= upAngle)
 				{
 					isUpActive = false;
@@ -374,6 +354,14 @@ void BossPhase_2::boomerangUpdate()
 			upBoomerangWorldTransform[i].TransferMatrix();
 		}
 	}
+	debugText_->SetPos(10, 10);
+	debugText_->Printf("Active:%d", isUpActive);
+	debugText_->SetPos(10, 30);
+	debugText_->Printf("Attack:%d", isUpAttack);
+	debugText_->SetPos(10, 50);
+	debugText_->Printf("translation_:%f,%f,%f", upBoomerangWorldTransform[0].translation_.x, upBoomerangWorldTransform[0].translation_.y, upBoomerangWorldTransform[0].translation_.z);
+	debugText_->SetPos(10, 70);
+	debugText_->Printf("angle:%f", angle);
 }
 
 void BossPhase_2::boomerangSet(Vector3 playerPos)
@@ -395,7 +383,7 @@ void BossPhase_2::boomerangSet(Vector3 playerPos)
 		isUpAttack = true;
 		isUpActive = true;
 	}
-	else if(isDownActive=false)
+	else if (isDownActive = false)
 	{
 		AnnihilationFlag[14] = true;
 		AnnihilationFlag[15] = true;
@@ -407,12 +395,12 @@ void BossPhase_2::boomerangSet(Vector3 playerPos)
 		upVector.normalize();
 
 		upBoomerangWorldTransform[0].translation_ = worldTransform_[0].translation_;
-		upBoomerangWorldTransform[0].scale_= worldTransform_[0].scale_;
+		upBoomerangWorldTransform[0].scale_ = worldTransform_[0].scale_;
 
 		isDownAttack = true;
 		isDownActive = true;
 	}
-	
+
 }
 
 void BossPhase_2::rushUpdate(Vector3 playerPos)

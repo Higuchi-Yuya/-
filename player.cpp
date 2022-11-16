@@ -85,7 +85,7 @@ void player::Update() {
 	float BR;
 
 	AR = pow(( worldTransform_.translation_.x+move.x)-0, 2) + pow((0 +worldTransform_.translation_.z+move.z), 2);
-	BR = pow((100 - worldTransform_.scale_.x*2), 2);
+	BR = pow((50 - worldTransform_.scale_.x*2), 2);
 
 	if (AR <= BR)
 	{
@@ -119,11 +119,11 @@ void player::Update() {
 	for (std::unique_ptr<playerBullet>& bullet : bullets_) {
 		bullet->Update();
 	}
-	debugText_->SetPos(10, 10);
+	/*debugText_->SetPos(10, 10);
 	debugText_->Printf("%f,%f",AR,BR);
 
 	debugText_->SetPos(10, 30);
-	debugText_->Printf("%f,%f,%f", worldTransform_.translation_.x, worldTransform_.translation_.y,worldTransform_.translation_.z);
+	debugText_->Printf("%f,%f,%f", worldTransform_.translation_.x, worldTransform_.translation_.y,worldTransform_.translation_.z);*/
 }
 
 void player::Attack() {

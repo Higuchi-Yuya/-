@@ -120,7 +120,7 @@ private:// ƒƒ“ƒo•Ï”
 
 #pragma region ˆÚ“®—p•Ï”
 
-	float angle = 90;
+	float angle = 0;
 
 	float radius = 50;
 

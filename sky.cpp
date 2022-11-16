@@ -6,7 +6,7 @@ void sky::Initialize() {
 	model_ = Model::CreateFromOBJ("test",true);
 	worldTransform_.Initialize();
 
-	worldTransform_.scale_ = { 100.0f,100.0f,100.0f };
+	worldTransform_.scale_ = { 500.0f,500.0f,500.0f };
 	affine::makeMatIdentity(worldTransform_.matWorld_);
 	affine::makeMatScale(worldTransform_.matWorld_, worldTransform_.scale_);
 	worldTransform_.TransferMatrix();

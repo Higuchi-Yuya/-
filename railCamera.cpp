@@ -36,6 +36,6 @@ void RailCamera::Update() {
 	//ビュープロジェクションを更新
 	viewProjection_.UpdateMatrix();
 
-	debugText_->SetPos(0.0f, 0.0f);
-	debugText_->Printf("eye=%f,%f,%f", viewProjection_.target.x, viewProjection_.target.y, viewProjection_.target.z);
+	/*debugText_->SetPos(0.0f, 0.0f);
+	debugText_->Printf("eye=%f,%f,%f", viewProjection_.target.x, viewProjection_.target.y, viewProjection_.target.z);*/
 }

@@ -89,14 +89,14 @@ void GameScene::Draw() {
 	model_->Draw(worldTransform,railCamera_->GetViewProjection());
 	player_->Draw(railCamera_->GetViewProjection());
 
-	// ボスフェーズ1の描画
-	bossPhase_1->Draw(railCamera_->GetViewProjection());
+	//// ボスフェーズ1の描画
+	//bossPhase_1->Draw(railCamera_->GetViewProjection());
 
 	// ボスフェーズ2の描画
 	bossPhase_2->Draw(railCamera_->GetViewProjection());
 
-	// ボスフェーズ3の描画
-	bossPhase_3->Draw(railCamera_->GetViewProjection());
+	//// ボスフェーズ3の描画
+	//bossPhase_3->Draw(railCamera_->GetViewProjection());
 
 	sky_->Draw(railCamera_->GetViewProjection());
 	/// </summary>
