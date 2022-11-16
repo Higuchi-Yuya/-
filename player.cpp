@@ -81,7 +81,18 @@ void player::Update() {
 		rot.x = 1;
 	}
 
-	worldTransform_.translation_ += move;
+	float AR;
+	float BR;
+
+	AR = pow(( worldTransform_.translation_.x+move.x)-0, 2) + pow((0 +worldTransform_.translation_.z+move.z), 2);
+	BR = pow((100 - worldTransform_.scale_.x*2), 2);
+
+	if (AR <= BR)
+	{
+		worldTransform_.translation_ += move;
+	}
+
+	/*worldTransform_.translation_ += move;*/
 	worldTransform_.rotation_.y += rot.y *affine::Deg2Rad;
 	worldTransform_.rotation_.x += rot.x * affine::Deg2Rad;
 	//ˆÚ“®ŒÀŠEÀ•W
@@ -108,8 +119,11 @@ void player::Update() {
 	for (std::unique_ptr<playerBullet>& bullet : bullets_) {
 		bullet->Update();
 	}
+	debugText_->SetPos(10, 10);
+	debugText_->Printf("%f,%f",AR,BR);
+
 	debugText_->SetPos(10, 30);
-	debugText_->Printf("%f,%f", worldTransform_.rotation_.x, 180 * affine::Deg2Rad);
+	debugText_->Printf("%f,%f,%f", worldTransform_.translation_.x, worldTransform_.translation_.y,worldTransform_.translation_.z);
 }
 
 void player::Attack() {

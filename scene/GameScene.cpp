@@ -18,11 +18,15 @@ void GameScene::Initialize() {
 
 	model_ = new Model;
 
+	model_ = Model::Create();
+
 	worldTransform.Initialize();
 
-	worldTransform.translation_ = Vector3(0,0,0);
+	worldTransform.scale_ = { 100,1,100 };
 
-	affine::makeMatTrans(worldTransform.matWorld_,worldTransform.translation_);
+	worldTransform.translation_ = Vector3(0,-2,0);
+
+	affine::makeAffine(worldTransform);
 
 	worldTransform.TransferMatrix();
 
