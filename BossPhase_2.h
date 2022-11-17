@@ -42,6 +42,8 @@ private:
 
 	double easing_Out(double start, double end, double time, double max_time);
 
+	double easing_In(double start, double end, double time, double max_time);
+	
 
 	float DegreeToRad(float num)
 	{
@@ -56,9 +58,12 @@ private:
 	// ビーム関連のリセット
 	void beamReset();
 
+	// 待機時のプレイヤーに向く処理
 	void TurnBodyToPlayer(Vector3 playerPos);
-
+	// ビーム打ってる間のボスの向き
 	void TurnBeamToPlayer();
+	// 突進の予備動作の時のプレイヤーに向く処理
+	void TurnRushToPlayer(Vector3 playerPos);
 
 	//ブーメラン関連のセット
 	void  boomerangSet(Vector3 playerPos);
@@ -163,15 +168,33 @@ private:// メンバ変数
 	// 突進開始用のフラグ
 	bool rushFlag = false;
 	// 下げるときのポジションY
-	float downPosY = 2.0f;
+	float downPosY = 10.0f;
 	// 元の高さを記録する変数
 	float originPosY = 0.0f;
+
+	// 開始時セットするフラグ
+	bool rushStartSetFlag = false;
 
 	// 突進時のボスとプレイヤーのベクトル
 	Vector3 rushToPlayer;
 
+	// 突進するときの車輪の速さ
+	int wheelTimer = 0;
+	int wheelEndTime = 4 * 60;
+	float wheelSpeedX = 0.0f;
+	float wheelStart = 0.0f;
+	float wheelEnd = 1.5f;
+	float wheelDepartureTime = 0.7f;
+	// 車輪のスピードがマックスに到達したら、ベクトルを一回作成するためのフラグ
+	bool RtoPFlag = false;
+
 	// 押し戻し判定があるかどうかチェックするフラグ
 	bool rushFinsh = false;
+	bool rushFinshSet = false;
+	int wheelTimer2 = 0;
+	int wheelEndTime2 = 4 * 60;
+	float wheelStart2 = 0.0f;
+	float wheelEnd2 = 0.0f;
 
 #pragma endregion
 

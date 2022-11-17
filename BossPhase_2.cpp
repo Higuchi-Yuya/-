@@ -6,7 +6,7 @@ void BossPhase_2::Initialize()
 {
 	input_ = Input::GetInstance();
 	debugText_ = DebugText::GetInstance();
-	model_ = Model::Create();
+	model_ = Model::CreateFromOBJ("BossCube");
 	beamModel_ = Model::Create();
 
 	for (int i = 0; i < 19; i++) {
@@ -16,7 +16,7 @@ void BossPhase_2::Initialize()
 	}
 
 	// 親
-	worldTransform_[0].translation_ = { 100,10,100 };
+	worldTransform_[0].translation_ = { 100,20,100 };
 	worldTransform_[0].scale_ = { kyubuScale,kyubuScale,kyubuScale };
 
 	// 子の座標設定
@@ -70,11 +70,11 @@ void BossPhase_2::Initialize()
 
 void BossPhase_2::Update(Vector3 playerPos)
 {
-
-	angle += 0.9 * affine::Deg2Rad;
-
-	worldTransform_[0].translation_.x = 100 * cos(angle);
-	worldTransform_[0].translation_.z = 100 * sin(angle);
+	if (rushFlag == false) {
+		angle += 0.9 * affine::Deg2Rad;
+		worldTransform_[0].translation_.x = 100 * cos(angle);
+		worldTransform_[0].translation_.z = 100 * sin(angle);
+	}
 
 	if (input_->TriggerKey(DIK_1))
 	{
@@ -84,14 +84,19 @@ void BossPhase_2::Update(Vector3 playerPos)
 	{
 		boomerangSet(playerPos);
 	}
-
-	if (beamOBJSetFlag == false) {
+	if (input_->TriggerKey(DIK_3)) 
+	{
+		rushFlag = true;
+	}
+	if (beamOBJSetFlag == false && rushFlag == false) {
 		TurnBodyToPlayer(playerPos);
 	}
 
 	boomerangUpdate();
 
 	beamUpdate(playerPos);
+
+	rushUpdate(playerPos);
 
 	TransferMat();
 }
@@ -130,9 +135,10 @@ void BossPhase_2::beamUpdate(Vector3 playerPos)
 		if (beamSetFlag == false) {
 			beamWorldTransform_.scale_.x = 0.5f;
 			beamWorldTransform_.scale_.y = 0.5f;
-			worldTransform_[10].translation_ = { 0,+kyubuLengh,0 };
-			worldTransform_[1].translation_ = { -kyubuLengh,0,0 };
+			worldTransform_[1].translation_ = { -kyubuLengh, 0, 0 };
+			worldTransform_[4].translation_ = { -kyubuLengh,0,0 };
 			worldTransform_[3].translation_ = { +kyubuLengh,0,0 };
+			worldTransform_[10].translation_ = { 0,+kyubuLengh,0 };
 			worldTransform_[15].translation_ = { 0,-kyubuLengh,0 };
 			beamSetFlag = true;
 		}
@@ -214,6 +220,7 @@ void BossPhase_2::beamUpdate(Vector3 playerPos)
 				beamFlag = false;
 				beamOBJSetFlag = false;
 				worldTransform_[1].translation_ = { +2, 0,-2 };
+				worldTransform_[4].translation_ = { -kyubuLengh, 0, 0 };
 				worldTransform_[3].translation_ = { -2, 0,-2 };
 				worldTransform_[10].translation_ = { 0,+2,-2 };
 				worldTransform_[15].translation_ = { 0,-2,-2 };
@@ -405,7 +412,107 @@ void BossPhase_2::boomerangSet(Vector3 playerPos)
 
 void BossPhase_2::rushUpdate(Vector3 playerPos)
 {
+	if (rushFlag == true) {
+		// ボスが下がる前のポジを記録
+		if (rushStartSetFlag == false) {
+			// 左側の車輪
+			worldTransform_[13].translation_ = { 0,+kyubuLengh,0 };
+			worldTransform_[5].translation_ = { 0,0,+kyubuLengh };
+			worldTransform_[3].translation_ = { 0,0,-kyubuLengh };
+			worldTransform_[18].translation_ = { 0,-kyubuLengh,0 };
+			// 右側の車輪
+			worldTransform_[11].translation_ = { 0,+kyubuLengh,0 };
+			worldTransform_[7].translation_ = { 0,0,+kyubuLengh };
+			worldTransform_[1].translation_ = { 0,0,-kyubuLengh };
+			worldTransform_[16].translation_ = { 0,-kyubuLengh,0 };
+			// 元の高さを保存
+			originPosY = worldTransform_[0].translation_.y;
+			rushStartSetFlag = true;
+		}
 
+		// ボスの位置をダウンポジのところまで下げる
+		if (rushFinsh == false) {
+			if (worldTransform_[0].translation_.y >= downPosY) {
+				worldTransform_[0].translation_.y -= 0.1f;
+				if (worldTransform_[0].rotation_.x <= 0.0f) {
+					worldTransform_[0].rotation_.x += 0.005f;
+				}
+			}
+			
+		}
+		if (worldTransform_[0].translation_.y < downPosY)
+		{
+			wheelTimer++;
+
+			if (wheelSpeedX < wheelDepartureTime)
+			{
+				TurnRushToPlayer(playerPos);
+			}
+			if (wheelTimer >= wheelEndTime) {
+				wheelTimer = wheelEndTime;
+			}
+			wheelSpeedX = easing_In(wheelStart, wheelEnd, wheelTimer, wheelEndTime);
+			worldTransform_[4].rotation_.x -= wheelSpeedX;
+			worldTransform_[8].rotation_.x -= wheelSpeedX;
+		}
+		// 車輪のスピードが突進させたスピードに行ったら
+		if (wheelSpeedX >= wheelDepartureTime)
+		{
+			if (RtoPFlag == false) {
+				rushToPlayer = playerPos - worldTransform_[0].translation_;
+				rushToPlayer.normalize();
+				rushToPlayer.y = 0.0f;
+				rushToPlayer *= 2.5f;
+				RtoPFlag = true;
+			}
+			if (rushFinsh == false) {
+				worldTransform_[0].translation_ += rushToPlayer;
+			}
+
+			float AR;
+			float BR;
+
+			AR = pow((worldTransform_[0].translation_.x), 2) + pow((worldTransform_[0].translation_.z), 2);
+			BR = pow(100, 2);
+
+			if (AR > BR)
+			{
+				rushFinsh = true;
+			}
+		}
+
+		//突進終了フラグが立ったら
+		if (rushFinsh == true) {
+			if (rushFinshSet == false) {
+				wheelStart2 = worldTransform_[0].rotation_.x;
+			}
+			wheelTimer2++;
+			
+			worldTransform_[4].rotation_.x = easing_In(wheelStart2, wheelEnd2, wheelTimer2, wheelEndTime2);
+			worldTransform_[8].rotation_.x = easing_In(wheelStart2, wheelEnd2, wheelTimer2, wheelEndTime2);
+			if (worldTransform_[0].translation_.y < originPosY) {
+				worldTransform_[0].translation_.y += 0.05f;
+			}
+			else if (worldTransform_[0].translation_.y >= originPosY) {
+				worldTransform_[0].translation_.y = originPosY;
+
+				worldTransform_[1].translation_ = { +kyubuLengh, 0,-kyubuLengh };
+				worldTransform_[3].translation_ = { -kyubuLengh, 0,-kyubuLengh };
+				worldTransform_[5].translation_ = { -kyubuLengh, 0,+kyubuLengh };
+				worldTransform_[7].translation_ = { +kyubuLengh, 0,+kyubuLengh };
+				worldTransform_[11].translation_ = { -kyubuLengh,+kyubuLengh, 0 };
+				worldTransform_[13].translation_ = { +kyubuLengh,+kyubuLengh, 0 };
+				worldTransform_[16].translation_ = { -kyubuLengh,-kyubuLengh, 0 };
+				worldTransform_[18].translation_ = { +kyubuLengh,-kyubuLengh, 0 };
+
+				rushFlag = false;
+			}
+		}
+		debugText_->SetPos(20, 140);
+		debugText_->Printf("rotaX:%f", worldTransform_[0].rotation_.x);
+		debugText_->SetPos(20, 160);
+		debugText_->Printf("speedX:%f", wheelSpeedX);
+	}
 }
 
 void BossPhase_2::TransferMat()
@@ -418,7 +525,7 @@ void BossPhase_2::TransferMat()
 		// ビーム打ち始めたら行列の掛け算を調整
 		if (beamFlag == true) {
 			// ビームで使うものを行列計算する
-			if (i == 10 || i == 3 || i == 1 || i == 15) {
+			if (i == 10 || i == 3 || i == 4 || i == 15) {
 				//worldTransform_[2].matWorld_ *= worldTransform_[0].matWorld_;
 				worldTransform_[i].matWorld_ *= worldTransform_[2].matWorld_;
 
@@ -429,6 +536,21 @@ void BossPhase_2::TransferMat()
 			// ビームオブジェの行列の転送
 
 			beamWorldTransform_.matWorld_ *= worldTransform_[0].matWorld_;
+		}
+		// 突進フラグが立っていたら
+		else if (rushFlag == true) {
+			// 車輪に必要なものを行列計算する
+			if (i == 3 || i == 5 || i == 13 || i == 18) {
+				// 左側の車輪
+				worldTransform_[i].matWorld_ *= worldTransform_[4].matWorld_;
+			}
+			else if (i == 1 || i == 7 || i == 11 || i == 16) {
+				// 右側の車輪
+				worldTransform_[i].matWorld_ *= worldTransform_[8].matWorld_;
+			}
+			else if (i != 0) {
+				worldTransform_[i].matWorld_ *= worldTransform_[0].matWorld_;
+			}
 		}
 		// それ以外の時は基本的に親と行列計算を行う
 		else if (i != 0) {
@@ -452,6 +574,13 @@ double BossPhase_2::easing_Out(double start, double end, double time, double max
 	time /= max_time;
 	double move = end - start;
 	return start + (move * (1 - (1 - time) * (1 - time)));
+}
+
+double BossPhase_2::easing_In(double start, double end, double time, double max_time)
+{
+	time /= max_time;
+	double move = end - start;
+	return start + (move * time * time);
 }
 
 void BossPhase_2::beamReset()
@@ -516,4 +645,14 @@ void BossPhase_2::TurnBeamToPlayer()
 	// X軸周り角度(θx)
 	worldTransform_[0].rotation_.x = std::atan2(velocityZ.y, -velocityZ.z);
 
+}
+
+void BossPhase_2::TurnRushToPlayer(Vector3 playerPos)
+{
+	// 打つ方向に向けてオブジェクトを回転させる
+	Vector3 velocity = playerPos - worldTransform_[0].translation_;
+	velocity.normalize();
+
+	// Y軸周り角度(θy)
+	worldTransform_[0].rotation_.y = -std::atan2(velocity.z, velocity.x) - DegreeToRad(90);
 }
