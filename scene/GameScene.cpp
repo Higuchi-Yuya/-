@@ -94,7 +94,7 @@ void GameScene::Draw() {
 	bossPhase_1->Draw(railCamera_->GetViewProjection());
 
 	// ボスフェーズ2の描画
-	//bossPhase_2->Draw(railCamera_->GetViewProjection());
+	bossPhase_2->Draw(railCamera_->GetViewProjection());
 
 	//// ボスフェーズ3の描画
 	//bossPhase_3->Draw(railCamera_->GetViewProjection());

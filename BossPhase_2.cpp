@@ -539,6 +539,11 @@ void BossPhase_2::rushUpdate(Vector3 playerPos)
 				worldTransform_[16].translation_ = { -kyubuLengh,-kyubuLengh, 0 };
 				worldTransform_[18].translation_ = { +kyubuLengh,-kyubuLengh, 0 };
 
+				float vectorX = worldTransform_->translation_.x;
+				float vectorZ = worldTransform_->translation_.z;
+				angle = atan2(vectorX, vectorZ);
+				angle += 1.57;
+
 				rushFlag = false;
 			}
 		}
