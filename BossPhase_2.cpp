@@ -7,8 +7,8 @@ void BossPhase_2::Initialize()
 	input_ = Input::GetInstance();
 	debugText_ = DebugText::GetInstance();
 	model_ = Model::CreateFromOBJ("BossCube");
-	beamModel_ = Model::Create();
-
+	beamModel_ = Model::CreateFromOBJ("beam");
+	
 	for (int i = 0; i < 19; i++) {
 
 		worldTransform_[i].Initialize();
