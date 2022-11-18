@@ -18,6 +18,11 @@ public:// メンバ関数
 	// 更新処理
 	void Update(Vector3 playerPos);
 
+	/// <summary>
+	/// タイトルシーン～ゲームシーンへ遷移するようの更新処理
+	/// </summary>
+	void TitleUpdate();
+
 	// 描画処理
 	void Draw(ViewProjection viewprojection);
 
@@ -81,5 +86,8 @@ private:// メンバ変数
 
 	// 徐々に拡大するときのスピード
 	Vector3 expansionScaleSpeed = { 0.05f,0.05f,0.05f };
+
+	//タイトル挙動用回転角
+	float titleRadian = 0;
 };
 
