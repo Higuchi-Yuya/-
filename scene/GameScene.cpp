@@ -52,7 +52,8 @@ void GameScene::Update() {
 	railCamera_->Update();
 
 	// ボスのフェーズ1の更新
-	bossPhase_1->Update(player_->GetworldPosition());
+	bossPhase_1->TitleUpdate();
+	//bossPhase_1->Update(player_->GetworldPosition());
 
 	// ボスのフェーズ2の更新
 	bossPhase_2->Update(player_->GetworldPosition());
@@ -90,10 +91,10 @@ void GameScene::Draw() {
 	player_->Draw(railCamera_->GetViewProjection());
 
 	//// ボスフェーズ1の描画
-	//bossPhase_1->Draw(railCamera_->GetViewProjection());
+	bossPhase_1->Draw(railCamera_->GetViewProjection());
 
 	// ボスフェーズ2の描画
-	bossPhase_2->Draw(railCamera_->GetViewProjection());
+	//bossPhase_2->Draw(railCamera_->GetViewProjection());
 
 	//// ボスフェーズ3の描画
 	//bossPhase_3->Draw(railCamera_->GetViewProjection());
@@ -120,4 +121,10 @@ void GameScene::Draw() {
 	Sprite::PostDraw();
 
 #pragma endregion
+}
+
+void GameScene::TitleUpdate()
+{
+
+
 }

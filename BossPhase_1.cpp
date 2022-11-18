@@ -1,5 +1,6 @@
 #include "BossPhase_1.h"
 
+
 void BossPhase_1::Initialize()
 {
 
@@ -81,6 +82,23 @@ void BossPhase_1::Update(Vector3 playerPos)
 	FlyBlocks(playerPos);
 
 	// s—ñ‚ÌXV‚Æ“]‘—
+	TransferMat();
+}
+
+void BossPhase_1::TitleUpdate()
+{
+	//‰¡‚É‰ñ“]‚µ‚È‚ª‚ç•‚—V
+	titleRadian += 0.5f;
+	if (titleRadian >= 360.0f) {
+		titleRadian -= 360.0f;
+	}
+
+	worldTransform_[0].rotation_.y =  MathUtility::PI / 180* titleRadian;
+	worldTransform_[0].translation_.y = (sin(MathUtility::PI / 180 * titleRadian) * 3.0f) + 10;
+
+	debugText_->SetPos(50, 90);
+	debugText_->Printf("boss1:translation:%1.4f,%1.4f,%1.4f", worldTransform_[0].translation_.x, worldTransform_[0].translation_.y, worldTransform_[0].translation_.z);
+
 	TransferMat();
 }
 
