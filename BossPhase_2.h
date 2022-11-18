@@ -68,6 +68,9 @@ private:
 	//ブーメラン関連のセット
 	void  boomerangSet(Vector3 playerPos);
 
+	// 突進のリセット関数
+	void rushReset();
+
 private:// メンバ変数
 	//ワールド変換データ
 	WorldTransform worldTransform_[19];

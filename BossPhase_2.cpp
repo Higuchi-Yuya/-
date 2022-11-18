@@ -91,7 +91,7 @@ void BossPhase_2::Update(Vector3 playerPos)
 	}
 	if (input_->TriggerKey(DIK_3)) 
 	{
-		rushFlag = true;
+		rushReset();
 	}
 	if (beamOBJSetFlag == false && rushFlag == false&&isUpActive==false&&isDownActive==false) {
 		TurnBodyToPlayer(playerPos);
@@ -430,6 +430,18 @@ void BossPhase_2::boomerangSet(Vector3 playerPos)
 		worldTransform_[0].rotation_.x = 0;
 	}
 
+}
+
+void BossPhase_2::rushReset()
+{
+	rushFlag = true;
+	rushStartSetFlag = false;
+	wheelTimer = 0;
+	wheelSpeedX = 0.0f;
+	RtoPFlag = false;
+	rushFinsh = false;
+	rushFinshSet = false;
+	wheelTimer2 = 0;
 }
 
 void BossPhase_2::rushUpdate(Vector3 playerPos)
