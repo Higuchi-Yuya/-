@@ -18,13 +18,13 @@ void GameScene::Initialize() {
 
 	model_ = new Model;
 
-	model_ = Model::Create();
+	model_ = Model::CreateFromOBJ("stage");
 
 	worldTransform.Initialize();
 
-	worldTransform.scale_ = { 100,1,100 };
+	worldTransform.scale_ = { 52,50,52 };
 
-	worldTransform.translation_ = Vector3(0,-2,0);
+	worldTransform.translation_ = Vector3(0,-2.1f,0);
 
 	affine::makeAffine(worldTransform);
 
