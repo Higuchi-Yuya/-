@@ -8,7 +8,7 @@ void BossPhase_2::Initialize()
 	debugText_ = DebugText::GetInstance();
 	model_ = Model::CreateFromOBJ("BossCube");
 	beamModel_ = Model::CreateFromOBJ("beam");
-	
+
 	for (int i = 0; i < 19; i++) {
 
 		worldTransform_[i].Initialize();
@@ -79,21 +79,25 @@ void BossPhase_2::Initialize()
 
 void BossPhase_2::Update(Vector3 playerPos)
 {
-	if (rushFlag == false&& isUpActive == false && isDownActive == false) {
-		angle += 0.9 * affine::Deg2Rad;
+	if (rushFlag == false && isUpActive == false && isDownActive == false) {
+			angle += 0.9 * affine::Deg2Rad;
 		worldTransform_[0].translation_.x = 100 * cos(angle);
 		worldTransform_[0].translation_.z = 100 * sin(angle);
+		if (angle > 6.28)
+		{
+			angle = 0;
+		}
 	}
 
 	if (input_->TriggerKey(DIK_1))
 	{
 		beamReset();
 	}
-	if (input_->TriggerKey(DIK_3)) 
+	if (input_->TriggerKey(DIK_3))
 	{
 		rushReset();
 	}
-	if (beamOBJSetFlag == false && rushFlag == false&&isUpActive==false&&isDownActive==false) {
+	if (beamOBJSetFlag == false && rushFlag == false && isUpActive == false && isDownActive == false) {
 		TurnBodyToPlayer(playerPos);
 	}
 	boomerangSet(playerPos);
@@ -472,7 +476,7 @@ void BossPhase_2::rushUpdate(Vector3 playerPos)
 					worldTransform_[0].rotation_.x += 0.005f;
 				}
 			}
-			
+
 		}
 		if (worldTransform_[0].translation_.y < downPosY)
 		{
@@ -521,7 +525,7 @@ void BossPhase_2::rushUpdate(Vector3 playerPos)
 				wheelStart2 = worldTransform_[0].rotation_.x;
 			}
 			wheelTimer2++;
-			
+
 			worldTransform_[4].rotation_.x = easing_In(wheelStart2, wheelEnd2, wheelTimer2, wheelEndTime2);
 			worldTransform_[8].rotation_.x = easing_In(wheelStart2, wheelEnd2, wheelTimer2, wheelEndTime2);
 			if (worldTransform_[0].translation_.y < originPosY) {
@@ -542,7 +546,13 @@ void BossPhase_2::rushUpdate(Vector3 playerPos)
 				float vectorX = worldTransform_->translation_.x;
 				float vectorZ = worldTransform_->translation_.z;
 				angle = atan2(vectorX, vectorZ);
-				angle += 1.57;
+				angle = atan2(vectorX, vectorZ);
+				angle -= 1.57;
+				if (angle > 0)
+				{
+					angle -= 6.28;
+				}
+				angle = abs(angle);
 
 				rushFlag = false;
 			}
