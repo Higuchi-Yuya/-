@@ -31,7 +31,7 @@ public:// メンバ関数
 private:
 	void beamUpdate(Vector3 playerPos);
 
-	void boomerangUpdate();
+	void boomerangUpdate(Vector3 playerPos);
 
 	void rushUpdate(Vector3 playerPos);
 
@@ -139,20 +139,16 @@ private:// メンバ変数
 	//上のブーメラン用ワールドトランスフォーム
 	WorldTransform upBoomerangWorldTransform[5];
 
-	float upAngle = 0;
-
 	Vector3 upVector;
 
 	bool isUpActive = false;
 
 	bool isUpAttack = false;
 
-	bool isUpDirectionRight=false;
+	bool isUpPreparation = false;
 
 	//下のブーメランようワールドトランスフォーム
 	WorldTransform downBoomerangWorldTransform[5];
-
-	float downAngle = 0;
 
 	Vector3 downVector;
 
@@ -160,7 +156,9 @@ private:// メンバ変数
 
 	bool isDownAttack = false;
 
-	bool isDownDirectionRight=false;
+	bool isDownDirectionRight = false;
+
+	bool isDownPreparation = false;
 
 #pragma endregion
 
