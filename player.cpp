@@ -5,7 +5,7 @@ void player::Initialize() {
 	input_ = Input::GetInstance();
 	debugText_ = DebugText::GetInstance();
 
-	model_ = Model::Create();
+	model_ = Model::CreateFromOBJ("player");
 
 	worldTransform_.Initialize();
 	worldTransform_.translation_ = Vector3(0.0f, 0.0f, 0.0f);
@@ -154,7 +154,7 @@ void player::Attack() {
 }
 
 void player::Draw(ViewProjection& viewProjection_) {
-	model_->Draw(worldTransform_, viewProjection_, textureHandle_);
+	model_->Draw(worldTransform_, viewProjection_);
 
 	/*model_->Draw(worldTransform3DReticle_, viewProjection_, textureHandle_);*/
 	//’e•`‰æ
