@@ -1,5 +1,6 @@
 #include "BossPhase_2.h"
 #include <math.h>
+#include <time.h>
 float PI = 3.1415926;
 
 void BossPhase_2::Initialize()
@@ -8,6 +9,7 @@ void BossPhase_2::Initialize()
 	debugText_ = DebugText::GetInstance();
 	model_ = Model::CreateFromOBJ("BossCube");
 	beamModel_ = Model::CreateFromOBJ("beam");
+	medamaModel_ = Model::CreateFromOBJ("Medama");
 
 	for (int i = 0; i < 19; i++) {
 
@@ -75,12 +77,19 @@ void BossPhase_2::Initialize()
 	}
 
 	beamWorldTransform_.Initialize();
+
+	medamaWT.Initialize();
+
+	medamaWT.scale_ = { 1.2f,1.2f,1.2f };
+	medamaWT.translation_ = { 0.0f,0.0f,-3.2f };
 }
 
 void BossPhase_2::Update(Vector3 playerPos)
 {
-	if (rushFlag == false && isUpActive == false && isDownActive == false) {
-			angle += 0.9 * affine::Deg2Rad;
+	playerPos_ = playerPos;
+
+	if (rushFlag == false && isUpActive == false && isDownActive == false && blowUpFlag == false) {
+		angle += 0.9 * affine::Deg2Rad;
 		worldTransform_[0].translation_.x = 100 * cos(angle);
 		worldTransform_[0].translation_.z = 100 * sin(angle);
 		if (angle > 6.28)
@@ -97,8 +106,13 @@ void BossPhase_2::Update(Vector3 playerPos)
 	{
 		rushReset();
 	}
-	if (beamOBJSetFlag == false && rushFlag == false && isUpActive == false && isDownActive == false) {
+	if (input_->TriggerKey(DIK_6))
+	{
+		blowUpFlag = true;
+	}
+	if (beamOBJSetFlag == false && rushFlag == false && isUpActive == false && isDownActive == false && blowUpFlag == false) {
 		TurnBodyToPlayer(playerPos);
+
 	}
 	boomerangSet(playerPos);
 
@@ -107,6 +121,8 @@ void BossPhase_2::Update(Vector3 playerPos)
 	beamUpdate(playerPos);
 
 	rushUpdate(playerPos);
+
+	DeathblowUp();
 
 	TransferMat();
 }
@@ -143,6 +159,7 @@ void BossPhase_2::Draw(ViewProjection viewprojection)
 		beamModel_->Draw(beamWorldTransform_, viewprojection);
 	}
 
+	medamaModel_->Draw(medamaWT, viewprojection);
 }
 
 void BossPhase_2::beamUpdate(Vector3 playerPos)
@@ -448,6 +465,68 @@ void BossPhase_2::rushReset()
 	wheelTimer2 = 0;
 }
 
+void BossPhase_2::DeathblowUp()
+{
+	std::srand(time(NULL));
+	if (blowUpFlag == true) {
+		if (blowUpSetFlag == false) {
+			for (int i = 0; i < 19; i++) {
+
+				if (i != 0) {
+					randomAngleX = (float)((rand() % 360 - 180) * affine::Deg2Rad);
+					randomAngleY = (float)((rand() % 360 - 180) * affine::Deg2Rad);
+					randomAngleZ = (float)((rand() % 360 - 180) * affine::Deg2Rad);
+					blowUpVel[i] = { randomAngleX,randomAngleY,randomAngleZ };
+					blowUpVel[i].normalize();
+					blowUpVel[i] *= 0.8f;
+				}
+				else {
+					blowUpVel[i] = { 0.0f,90.0f * affine::Deg2Rad,0.0f };
+					blowUpVel[i].normalize();
+					blowUpVel[i] *= 0.6f;
+				}
+
+			}
+			AnnihilationFlag[0] = true;
+			blowUpSetFlag = true;
+		}
+		if (worldTransform_[0].rotation_.x < 0.0f) {
+			worldTransform_[0].rotation_.x += 0.01f;
+		}
+		else if (worldTransform_[0].rotation_.y < blowStartAngle) {
+			worldTransform_[0].rotation_.y += 0.5f;
+
+		}
+		else {
+			// 飛び散る処理
+			for (int i = 1; i < 19; i++) {
+				worldTransform_[i].translation_ += blowUpVel[i];
+				worldTransform_[i].rotation_ += blowUpRotaVel;
+			}
+
+			// 目玉単体の回転処理
+			medamaRotaTimer++;
+			if (medamaRotaTimer >= medamaRotaEndTime) {
+				medamaRotaTimer = medamaRotaEndTime;
+				medamaDownFlag = true;
+			}
+			medamaWT.rotation_.y = easing_Out(startMedamaAngle, endMedamaAngle, medamaRotaTimer, medamaRotaEndTime);
+
+			// 落下処理
+			if (medamaDownFlag == true) {
+				medamawaitTimer++;
+				if (medamawaitTimer >= 0.8 * 60) {
+					medamaGraviti += 0.03;
+					medamaWT.translation_.y -= medamaGraviti;
+				}
+			}
+
+
+		}
+
+	}
+}
+
 void BossPhase_2::rushUpdate(Vector3 playerPos)
 {
 	if (rushFlag == true) {
@@ -566,6 +645,7 @@ void BossPhase_2::rushUpdate(Vector3 playerPos)
 
 void BossPhase_2::TransferMat()
 {
+
 	for (int i = 0; i < 19; i++) {
 
 		affine::makeAffine(worldTransform_[i]);
@@ -581,6 +661,7 @@ void BossPhase_2::TransferMat()
 			}
 			else if (i != 0) {
 				worldTransform_[i].matWorld_ *= worldTransform_[0].matWorld_;
+
 			}
 			// ビームオブジェの行列の転送
 
@@ -599,17 +680,51 @@ void BossPhase_2::TransferMat()
 			}
 			else if (i != 0) {
 				worldTransform_[i].matWorld_ *= worldTransform_[0].matWorld_;
+
 			}
+
 		}
 		// それ以外の時は基本的に親と行列計算を行う
 		else if (i != 0) {
 			worldTransform_[i].matWorld_ *= worldTransform_[0].matWorld_;
+
 		}
 
 		worldTransform_[i].TransferMatrix();
 	}
 
+	if (blowUpFlag == false) {
+		affine::makeAffine(medamaWT);
+		medamaWT.matWorld_ *= worldTransform_[0].matWorld_;
+		medamaWT.TransferMatrix();
+	}
+	else if (blowUpFlag == true) {
+		if (worldTransform_[0].rotation_.y < blowStartAngle) {
+			affine::makeAffine(medamaWT);
+			medamaWT.matWorld_ *= worldTransform_[0].matWorld_;
+			medamaWT.TransferMatrix();
+
+		}
+		else {
+			if (blowmatSetFlag == false) {
+				Kari = worldTransform_[0];
+				TurnDeadToPlayer(playerPos_);
+				Kari.rotation_.x = 0.0f;
+				affine::makeAffine(Kari);
+
+				blowmatSetFlag = true;
+			}
+			affine::makeAffine(medamaWT);
+			medamaWT.matWorld_ *= Kari.matWorld_;
+			medamaWT.TransferMatrix();
+		}
+	}
+	debugText_->SetPos(20, 200);
+	debugText_->Printf("medama:%f,%f,%f", medamaWT.rotation_.x, medamaWT.rotation_.y, medamaWT.rotation_.z);
+
+
 	beamWorldTransform_.TransferMatrix();
+
 }
 
 float BossPhase_2::Lerp(const float& startPos, const float& endPos, const float& timeRate)
@@ -672,6 +787,27 @@ void BossPhase_2::TurnBodyToPlayer(Vector3 playerPos)
 
 	// X軸周り角度(θx)
 	worldTransform_[0].rotation_.x = std::atan2(velocityZ.y, -velocityZ.z);
+}
+
+void BossPhase_2::TurnDeadToPlayer(Vector3 playerPos)
+{
+	// 打つ方向に向けてオブジェクトを回転させる
+	Vector3 velocity = playerPos - Kari.translation_;
+	velocity.normalize();
+
+	// Y軸周り角度(θy)
+	Kari.rotation_.y = -std::atan2(velocity.z, velocity.x) - DegreeToRad(90);
+
+	// Y軸周りに-θy回す回転行列を計算
+	Matrix4 RotY;
+	affine::makeMatRotY(RotY, -Kari.rotation_.y);
+
+	// velosity_に回転行列を掛け算してvelosityZを求める
+	Vector3 velocityZ = velocity;
+	velocityZ = affine::MatVector(RotY, velocityZ);
+
+	// X軸周り角度(θx)
+	//Kari.rotation_.x = std::atan2(velocityZ.y, -velocityZ.z);
 }
 
 void BossPhase_2::TurnBeamToPlayer()

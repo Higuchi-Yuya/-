@@ -60,6 +60,10 @@ private:
 
 	// 待機時のプレイヤーに向く処理
 	void TurnBodyToPlayer(Vector3 playerPos);
+	
+	// 死んだときに一度だけプレイヤーに向く処理
+	void TurnDeadToPlayer(Vector3 playerPos);
+
 	// ビーム打ってる間のボスの向き
 	void TurnBeamToPlayer();
 	// 突進の予備動作の時のプレイヤーに向く処理
@@ -70,6 +74,9 @@ private:
 
 	// 突進のリセット関数
 	void rushReset();
+
+	// 死亡時の爆散処理
+	void DeathblowUp();
 
 private:// メンバ変数
 	//ワールド変換データ
@@ -91,6 +98,8 @@ private:// メンバ変数
 
 	//モデル
 	Model* model_ = nullptr;
+
+	Vector3 playerPos_;
 
 	// ビーム用の変数
 	#pragma region ビーム用の変数
@@ -197,6 +206,32 @@ private:// メンバ変数
 	float wheelStart2 = 0.0f;
 	float wheelEnd2 = 0.0f;
 
+#pragma endregion
+
+#pragma region 爆破用
+
+	bool blowUpFlag = false;
+	bool blowUpSetFlag = false;
+	bool blowmatSetFlag = false;
+	float randomAngleX = 0, randomAngleY = 0, randomAngleZ = 0;
+	float blowStartAngle = (360 * 6) * affine::Deg2Rad;
+
+	Vector3 blowUpVel[19];
+	Vector3 blowUpRotaVel={0.4f,0.4f,0.0f};
+	WorldTransform Kari;
+
+	int medamawaitTimer = 0;
+	int medamaRotaTimer=0;
+	int	medamaRotaEndTime = 5 * 60;
+	float startMedamaAngle = 0;
+	float endMedamaAngle = DegreeToRad(360.0f * 15.0f);
+	bool medamaDownFlag = false;
+	float medamaGraviti = 0.1;
+#pragma endregion
+
+#pragma region 目玉
+	WorldTransform medamaWT;
+	Model* medamaModel_ = nullptr;
 #pragma endregion
 
 };
