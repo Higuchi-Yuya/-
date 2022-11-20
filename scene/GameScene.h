@@ -54,6 +54,13 @@ class GameScene {
 	/// </summary>
 	void TitleUpdate();
 
+	///<summary>
+	///衝突判定と応答
+	///</summary>
+	void CheckAllCollisions();
+
+	bool calcRaySphere(Vector3 l,Vector3 v,	Vector3 p,float r);
+
   private: // メンバ変数
 	DirectXCommon* dxCommon_ = nullptr;
 	Input* input_ = nullptr;

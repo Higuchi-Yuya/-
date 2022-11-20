@@ -28,6 +28,21 @@ public:// メンバ関数
 	// 描画処理
 	void Draw(ViewProjection viewprojection);
 
+	//衝突を検出したら呼び出されたるコールバック関数
+	void OnCollision();
+
+	bool GetBeamFrag() { return beamOBJSetFlag; }
+
+	bool GetBoomerangflg(bool UpOrDown);
+
+	WorldTransform GetPos() { return worldTransform_[0]; }
+
+	Vector3 GetUpBoomerangPos() { return upBoomerangWorldTransform->translation_; }
+
+	Vector3 GetDownBoomerangPos() { return downBoomerangWorldTransform->translation_; }
+
+	WorldTransform GetBeamTransform() { return beamWorldTransform_; }
+
 private:
 	void beamUpdate(Vector3 playerPos);
 

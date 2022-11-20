@@ -26,6 +26,13 @@ public:// メンバ関数
 	// 描画処理
 	void Draw(ViewProjection viewprojection);
 
+	WorldTransform GetPos() { return worldTransform_[0]; }
+
+	//衝突を検出したら呼び出されたるコールバック関数
+	void OnCollision();
+
+	std::unique_ptr<BossBullet>& GetBullet() { return bullet; }
+
 private:// 静的メンバ関数
 
 	// ブロックを飛ばす処理

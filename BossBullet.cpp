@@ -48,7 +48,7 @@ void BossBullet::Draw(const ViewProjection& viewProjection)
 
 Vector3 BossBullet::GetBulletWorldPosition()
 {
-	return Vector3();
+	return worldTransform_.translation_;
 }
 
 void BossBullet::OnCollision()

@@ -21,6 +21,7 @@ void BossPhase_1::Initialize()
 
 	// ボスバレットの初期化
 	bullet = std::make_unique<BossBullet>();
+	bullet->SetPos(worldTransform_[0].translation_);
 
 	// 子の座標設定
 
@@ -115,6 +116,11 @@ void BossPhase_1::Draw(ViewProjection viewprojection)
 	if (AnnihilationFlag[randomBlock] == true && bullet->GetToPlayerFlag() == false) {
 		bullet->Draw(viewprojection);
 	}
+}
+
+void BossPhase_1::OnCollision()
+{
+
 }
 
 void BossPhase_1::FlyBlocks(Vector3 playerPos)

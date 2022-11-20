@@ -147,12 +147,6 @@ void BossPhase_2::Draw(ViewProjection viewprojection)
 			model_->Draw(worldTransform_[i], viewprojection);
 		}
 	}
-	if (isDownAttack == true)
-	{
-		for (int i = 0; i < 5; i++) {
-			model_->Draw(upBoomerangWorldTransform[i], viewprojection);
-		}
-	}
 
 	// ƒr[ƒ€‚ð‘Å‚¿Žn‚ß‚½‚ç•`‰æ
 	if (beamSetFlag == true) {
@@ -160,6 +154,19 @@ void BossPhase_2::Draw(ViewProjection viewprojection)
 	}
 
 	medamaModel_->Draw(medamaWT, viewprojection);
+}
+
+void BossPhase_2::OnCollision()
+{
+}
+
+bool BossPhase_2::GetBoomerangflg(bool UpOrDown)
+{
+	if (UpOrDown)
+	{
+		return isUpAttack;
+	}
+	return isDownAttack;
 }
 
 void BossPhase_2::beamUpdate(Vector3 playerPos)
@@ -280,6 +287,7 @@ void BossPhase_2::boomerangUpdate(Vector3 playerPos)
 			if (upBoomerangWorldTransform[0].translation_.y >= worldTransform_[0].translation_.y + kyubuLengh + 15)
 			{
 				isUpPreparation = false;
+				isUpAttack = true;
 			}
 		}
 		else if (isUpAttack == true)
@@ -336,6 +344,7 @@ void BossPhase_2::boomerangUpdate(Vector3 playerPos)
 			if (downBoomerangWorldTransform[0].translation_.y <= 2)
 			{
 				isDownPreparation = false;
+				isDownAttack = true;
 			}
 		}
 		else if (isDownAttack == true)
@@ -418,7 +427,6 @@ void BossPhase_2::boomerangSet(Vector3 playerPos)
 		upVector.y = 0;
 		upVector.normalize();
 
-		isUpAttack = true;
 		isUpActive = true;
 		isUpPreparation = true;
 
@@ -443,8 +451,6 @@ void BossPhase_2::boomerangSet(Vector3 playerPos)
 		/*upVector = playerPos - worldTransform_[0].translation_;
 		upVector.y = 0;
 		upVector.normalize();*/
-
-		isDownAttack = true;
 		isDownActive = true;
 		isDownPreparation = true;
 
