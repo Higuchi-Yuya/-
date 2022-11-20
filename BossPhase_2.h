@@ -28,6 +28,21 @@ public:// メンバ関数
 	// 描画処理
 	void Draw(ViewProjection viewprojection);
 
+	//衝突を検出したら呼び出されたるコールバック関数
+	void OnCollision();
+
+	bool GetBeamFrag() { return beamOBJSetFlag; }
+
+	bool GetBoomerangflg(bool UpOrDown);
+
+	WorldTransform GetPos() { return worldTransform_[0]; }
+
+	Vector3 GetUpBoomerangPos() { return upBoomerangWorldTransform->translation_; }
+
+	Vector3 GetDownBoomerangPos() { return downBoomerangWorldTransform->translation_; }
+
+	WorldTransform GetBeamTransform() { return beamWorldTransform_; }
+
 private:
 	void beamUpdate(Vector3 playerPos);
 
@@ -60,6 +75,10 @@ private:
 
 	// 待機時のプレイヤーに向く処理
 	void TurnBodyToPlayer(Vector3 playerPos);
+	
+	// 死んだときに一度だけプレイヤーに向く処理
+	void TurnDeadToPlayer(Vector3 playerPos);
+
 	// ビーム打ってる間のボスの向き
 	void TurnBeamToPlayer();
 	// 突進の予備動作の時のプレイヤーに向く処理
@@ -67,6 +86,12 @@ private:
 
 	//ブーメラン関連のセット
 	void  boomerangSet(Vector3 playerPos);
+
+	// 突進のリセット関数
+	void rushReset();
+
+	// 死亡時の爆散処理
+	void DeathblowUp();
 
 private:// メンバ変数
 	//ワールド変換データ
@@ -88,6 +113,8 @@ private:// メンバ変数
 
 	//モデル
 	Model* model_ = nullptr;
+
+	Vector3 playerPos_;
 
 	// ビーム用の変数
 	#pragma region ビーム用の変数
@@ -125,7 +152,7 @@ private:// メンバ変数
 
 #pragma region 移動用変数
 
-	float angle = 0;
+	float angle = 1.57;
 
 	float radius = 50;
 
@@ -194,6 +221,32 @@ private:// メンバ変数
 	float wheelStart2 = 0.0f;
 	float wheelEnd2 = 0.0f;
 
+#pragma endregion
+
+#pragma region 爆破用
+
+	bool blowUpFlag = false;
+	bool blowUpSetFlag = false;
+	bool blowmatSetFlag = false;
+	float randomAngleX = 0, randomAngleY = 0, randomAngleZ = 0;
+	float blowStartAngle = (360 * 6) * affine::Deg2Rad;
+
+	Vector3 blowUpVel[19];
+	Vector3 blowUpRotaVel={0.4f,0.4f,0.0f};
+	WorldTransform Kari;
+
+	int medamawaitTimer = 0;
+	int medamaRotaTimer=0;
+	int	medamaRotaEndTime = 5 * 60;
+	float startMedamaAngle = 0;
+	float endMedamaAngle = DegreeToRad(360.0f * 15.0f);
+	bool medamaDownFlag = false;
+	float medamaGraviti = 0.1;
+#pragma endregion
+
+#pragma region 目玉
+	WorldTransform medamaWT;
+	Model* medamaModel_ = nullptr;
 #pragma endregion
 
 };

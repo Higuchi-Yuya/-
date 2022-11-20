@@ -71,6 +71,13 @@ class GameScene {
 	/// </summary>
 	void TitleUpdate();
 
+	///<summary>
+	///衝突判定と応答
+	///</summary>
+	void CheckAllCollisions();
+
+	bool calcRaySphere(Vector3 l,Vector3 v,	Vector3 p,float r);
+
 	//シェイク関数
 	Vector3 Shake(const Vector3& firstPos, int& shakeCount);
 
