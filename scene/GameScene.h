@@ -18,6 +18,23 @@
 #include "BossPhase_3.h"
 #include<sstream>
 
+enum PositionIndex {
+	Title,	//タイトル
+	GameStart,//ゲーム開始
+	GameBossTrans,//ボス変身
+	GameBossDeath,//ボス死亡
+	
+	PositionIndexCount,//インデックス総数
+};
+
+enum Phase {
+	TitleToGame,//タイトルからゲームへ
+	Boss1To2,//ボス１から２
+	GameToResult,//ゲームからリザルト(クリア)
+
+	PhaseIndex,//フェーズの総数
+};
+
 /// <summary>
 /// ゲームシーン
 /// </summary>
@@ -54,6 +71,9 @@ class GameScene {
 	/// </summary>
 	void TitleUpdate();
 
+	//シェイク関数
+	Vector3 Shake(const Vector3& firstPos, int& shakeCount);
+
   private: // メンバ変数
 	DirectXCommon* dxCommon_ = nullptr;
 	Input* input_ = nullptr;
@@ -72,6 +92,14 @@ class GameScene {
 
 	//テクスチャハンドル
 	uint32_t textureHandle_ = 0u;
+
+	//カメラ座標
+	Vector3 cameraPos[PositionIndexCount];
+	ViewProjection titleCamera;
+	float animeTimer = 0;
+
+	int animetionPhase = 0;
+	int cameraShakeCount = 0;
 
 	/// <summary>
 	/// ゲームシーン用

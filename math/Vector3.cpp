@@ -44,6 +44,16 @@ Vector3& Vector3::operator*(const Matrix4& m) {
 	return temp;
 }
 
+const Vector3 Vector3::lerp(const Vector3& start, const Vector3& end, const float Timer)
+{
+	Vector3 pos;
+	pos.x = start.x * (1.0f - Timer) + end.x * Timer;
+	pos.y = start.y * (1.0f - Timer) + end.y * Timer;
+	pos.z = start.z * (1.0f - Timer) + end.z * Timer;
+
+	return pos;
+}
+
 
 
 const Vector3 operator+(const Vector3& v1, const Vector3& v2)

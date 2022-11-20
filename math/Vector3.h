@@ -32,6 +32,8 @@ class Vector3 {
 	Vector3& operator+(float s);
 	Vector3& operator*(const Matrix4& m);
 
+	const Vector3 lerp(const Vector3& start, const Vector3& end, const float Timer);
+
 };
 const Vector3 operator+(const Vector3& v1, const Vector3& v2);
 const Vector3 operator-(const Vector3& v1, const Vector3& v2);

@@ -26,6 +26,8 @@ public:// メンバ関数
 	// 描画処理
 	void Draw(ViewProjection viewprojection);
 
+	WorldTransform GetWorldTransformP() const { return worldTransform_[0]; }
+
 private:// 静的メンバ関数
 
 	// ブロックを飛ばす処理
@@ -41,6 +43,8 @@ private:// 静的メンバ関数
 	void TransferMat();
 
 	void TurnBodyToPlayer(Vector3 playerPos);
+
+
 
 private:// メンバ変数
 
