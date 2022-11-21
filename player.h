@@ -54,6 +54,8 @@ public:
 	const std::list<std::unique_ptr<playerBullet>>& GetBullets() { return bullets_; }
 
 	const WorldTransform* GetWorldTransform() { return &worldTransform_; }
+
+	void SetEndMoveRotation(Vector3 Transform);
 private:
 	//ワールド変換データ
 	WorldTransform worldTransform_;

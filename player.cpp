@@ -197,6 +197,14 @@ Vector3 player::GetworldPosition()
 	worldpos.z = worldTransform_.matWorld_.m[3][2];
 	return worldpos;
 }
+void player::SetEndMoveRotation(Vector3 Transform)
+{
+	// 打つ方向に向けてオブジェクトを回転させる
+	Vector3 velocity = Transform - worldTransform_.translation_;
+	velocity.normalize();
+	// Y軸周り角度(θy)
+	worldTransform_.rotation_.y = std::atan2(velocity.x, velocity.z);
+}
 void player::OnCollision()
 {
 	if (isDamageInterval==false)

@@ -121,21 +121,21 @@ void BossPhase_2::Update(Vector3 playerPos)
 				isUpActive == false;
 				isDownActive = false;
 				rushFlag = false;
-				randAttack = rand();
-				randAttack %= 100;
-				if (randAttack < 25)
+				randAttack = rand()%4;
+				//randAttack %= 100;
+				if (randAttack ==0)
 				{
 					Attack = 1;
 				}
-				if (randAttack >= 25 && randAttack < 50)
+				if (randAttack ==1)
 				{
 					Attack = 2;
 				}
-				if (randAttack >= 50 && randAttack < 75)
+				if (randAttack ==2)
 				{
 					Attack = 3;
 				}
-				if (randAttack >= 75 && randAttack < 100)
+				if (randAttack ==3)
 				{
 					Attack = 4;
 				}
@@ -198,8 +198,8 @@ void BossPhase_2::Update(Vector3 playerPos)
 
 	TransferMat();
 
-	debugText_->SetPos(10, 140);
-	debugText_->Printf("%d", Attack);
+	debugText_->SetPos(10, 130);
+	debugText_->Printf("Attack=%d,%d,%d", Attack,oldAttack,randAttack);
 }
 
 void BossPhase_2::Draw(ViewProjection viewprojection)

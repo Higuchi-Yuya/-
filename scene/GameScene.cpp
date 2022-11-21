@@ -262,8 +262,11 @@ void GameScene::CheckAllCollisions()
 
 		if (calcRaySphere({ BeamTransform.matWorld_.m[3][0], BeamTransform.matWorld_.m[3][1] , BeamTransform.matWorld_.m[3][2] }, def, playerPos, playerR))
 		{
-			//ボス1の衝突時コールバックを呼び出す
-			player_->OnCollision();
+			if (BeamTransform.scale_.z>40)
+			{
+				//ボス1の衝突時コールバックを呼び出す
+				player_->OnCollision();
+			}
 		}
 	}
 #pragma endregion
@@ -375,6 +378,7 @@ void GameScene::AnimationCameraUpdate()
 	if (input_->PushKey(DIK_7)) {
 		animeTimer = 0;
 		animetionPhase = Phase::GameToResult;
+		player_->SetEndMoveRotation(bossPhase_2->GetPos().translation_);
 		//ボスを死亡
 		bossPhase_2->SetIsDead(true);
 		boss2Mat = bossPhase_2->GetPos().matWorld_;
