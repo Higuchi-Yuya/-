@@ -35,6 +35,8 @@ public:// ƒƒ“ƒoŠÖ”
 
 	bool GetBoomerangflg(bool UpOrDown);
 
+	void SetIsDead(bool isDead) { blowUpFlag = isDead; }
+
 	WorldTransform GetPos() { return worldTransform_[0]; }
 
 	Vector3 GetUpBoomerangPos() { return upBoomerangWorldTransform->translation_; }

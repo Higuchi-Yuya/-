@@ -100,9 +100,6 @@ void BossPhase_1::TitleUpdate()
 	worldTransform_[0].rotation_.y =  MathUtility::PI / 180* titleRadian;
 	worldTransform_[0].translation_.y = (sin(MathUtility::PI / 180 * titleRadian) * 2.0f) + 12;
 
-	debugText_->SetPos(50, 90);
-	debugText_->Printf("boss1:translation:%1.4f,%1.4f,%1.4f", worldTransform_[0].translation_.x, worldTransform_[0].translation_.y, worldTransform_[0].translation_.z);
-
 	TransferMat();
 }
 
