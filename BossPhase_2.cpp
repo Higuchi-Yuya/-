@@ -1,6 +1,7 @@
 #include "BossPhase_2.h"
 #include <math.h>
 #include <time.h>
+#include<stdlib.h>
 float PI = 3.1415926;
 
 void BossPhase_2::Initialize()
@@ -8,6 +9,7 @@ void BossPhase_2::Initialize()
 	input_ = Input::GetInstance();
 	debugText_ = DebugText::GetInstance();
 	model_ = Model::CreateFromOBJ("BossCube");
+	torunedoModel_ = Model::CreateFromOBJ("Torunedo");
 	beamModel_ = Model::CreateFromOBJ("beam");
 	medamaModel_ = Model::CreateFromOBJ("Medama");
 
@@ -57,8 +59,10 @@ void BossPhase_2::Initialize()
 		upBoomerangWorldTransform[i].Initialize();
 		downBoomerangWorldTransform[i].Initialize();
 	}
+	torunedoTrans.Initialize();
 	//ã‚Ì’i
 	upBoomerangWorldTransform[0].scale_ = { kyubuScale,kyubuScale,kyubuScale };
+	torunedoTrans.scale_ = {10,35,10};
 	upBoomerangWorldTransform[1].translation_ = { 0,0,-kyubuLengh };
 	upBoomerangWorldTransform[2].translation_ = { -kyubuLengh,0, 0 };
 	upBoomerangWorldTransform[3].translation_ = { 0,0,+kyubuLengh };
@@ -98,6 +102,64 @@ void BossPhase_2::Update(Vector3 playerPos)
 		}
 	}
 
+	std::srand(time(NULL));
+	if (rushFlag == false && isUpActive == false && isDownActive == false && beamFlag == false&&isAction==Action::AttackInterval)
+	{
+		intervalFrame++;
+		if (intervalFrame >= maxIntervalFrame)
+		{
+			intervalFrame = 0;
+			isAction = Action::AttackSelection;
+		}
+	}
+	if (rushFlag == false && isUpActive == false && isDownActive == false&&beamFlag==false&& isAction == Action::AttackSelection)
+	{
+		do
+		{
+			beamFlag == false;
+			isUpActive == false;
+			isDownActive = false;
+			rushFlag = false;
+			randAttack = rand();
+			randAttack %= 100;
+			if (randAttack < 25)
+			{
+				Attack = 1;
+			}
+			if (randAttack >= 25 && randAttack < 50)
+			{
+				Attack = 2;
+			}
+			if (randAttack >= 50 && randAttack < 75)
+			{
+				Attack = 3;
+			}
+			if (randAttack >= 75 && randAttack < 100)
+			{
+				Attack = 4;
+			}
+		} while (Attack == oldAttack);
+		oldAttack = Attack;
+		if (Attack == 1)
+		{
+			beamReset();
+		}
+		if (Attack == 2)
+		{
+			rushReset();
+		}
+		if (Attack == 3)
+		{
+			boomerangSet(playerPos,true);
+		}
+		if (Attack == 4)
+		{
+			boomerangSet(playerPos,false);
+		}
+		isAction = Action::AttackInMotion;
+	}
+
+
 	if (input_->TriggerKey(DIK_1))
 	{
 		beamReset();
@@ -110,11 +172,12 @@ void BossPhase_2::Update(Vector3 playerPos)
 	{
 		blowUpFlag = true;
 	}
+
+
 	if (beamOBJSetFlag == false && rushFlag == false && isUpActive == false && isDownActive == false && blowUpFlag == false) {
 		TurnBodyToPlayer(playerPos);
 
 	}
-	boomerangSet(playerPos);
 
 	boomerangUpdate(playerPos);
 
@@ -126,8 +189,8 @@ void BossPhase_2::Update(Vector3 playerPos)
 
 	TransferMat();
 
-	debugText_->SetPos(10, 90);
-	debugText_->Printf("boss2HP%d", HP);
+	debugText_->SetPos(10, 140);
+	debugText_->Printf("%d", Attack);
 }
 
 void BossPhase_2::Draw(ViewProjection viewprojection)
@@ -136,6 +199,10 @@ void BossPhase_2::Draw(ViewProjection viewprojection)
 	{
 		for (int i = 0; i < 5; i++) {
 			model_->Draw(upBoomerangWorldTransform[i], viewprojection);
+		}
+		if (isUpAttack)
+		{
+			torunedoModel_->Draw(torunedoTrans,viewprojection);
 		}
 	}
 	if (isDownActive == true)
@@ -263,6 +330,7 @@ void BossPhase_2::beamUpdate(Vector3 playerPos)
 			if (beamWorldTransform_.scale_.x <= 0.0f) {
 				beamFlag = false;
 				beamOBJSetFlag = false;
+				isAction = Action::AttackInterval;
 				worldTransform_[1].translation_ = { +2, 0,-2 };
 				worldTransform_[4].translation_ = { -kyubuLengh, 0, 0 };
 				worldTransform_[3].translation_ = { -2, 0,-2 };
@@ -285,6 +353,7 @@ void BossPhase_2::boomerangUpdate(Vector3 playerPos)
 	if (isUpActive == true)
 	{
 		upBoomerangWorldTransform[0].rotation_.y += 60 * affine::Deg2Rad;
+		torunedoTrans.rotation_ = upBoomerangWorldTransform[0].rotation_;
 		if (isUpPreparation == true)
 		{
 			upBoomerangWorldTransform[0].translation_.y += 15.0f / 60;
@@ -300,11 +369,14 @@ void BossPhase_2::boomerangUpdate(Vector3 playerPos)
 			upBoomerangWorldTransform[0].translation_.y += upVector.y * 5;
 			upBoomerangWorldTransform[0].translation_.z += upVector.z * 5;
 
+			torunedoTrans.translation_ = upBoomerangWorldTransform[0].translation_;
+			torunedoTrans.translation_.y = 0;
+
 			float AR;
 			float BR;
 
 			AR = pow((upBoomerangWorldTransform[0].translation_.x), 2) + pow((upBoomerangWorldTransform[0].translation_.z), 2);
-			BR = pow((100 - upBoomerangWorldTransform[0].scale_.x * 1.5), 2);
+			BR = pow((120 - upBoomerangWorldTransform[0].scale_.x * 1.5), 2);
 
 			if (AR > BR)
 			{
@@ -328,15 +400,18 @@ void BossPhase_2::boomerangUpdate(Vector3 playerPos)
 			{
 				isUpActive = false;
 				upBoomerangWorldTransform[0].rotation_.y = 0;
+				isAction = Action::AttackInterval;
 			}
 		}
 		for (int i = 0; i < 5; i++) {
 			affine::makeAffine(upBoomerangWorldTransform[i]);
+			affine::makeAffine(torunedoTrans);
 			if (i != 0)
 			{
 				upBoomerangWorldTransform[i].matWorld_ *= upBoomerangWorldTransform[i].parent_->matWorld_;
 			}
 			upBoomerangWorldTransform[i].TransferMatrix();
+			torunedoTrans.TransferMatrix();
 		}
 	}
 	if (isDownActive == true)
@@ -353,10 +428,14 @@ void BossPhase_2::boomerangUpdate(Vector3 playerPos)
 		}
 		else if (isDownAttack == true)
 		{
-			if (downBoomerangWorldTransform[0].rotation_.y <= 18000.0f * affine::Deg2Rad)
+			if (downBoomerangWorldTransform[0].rotation_.y <= 12000.0f * affine::Deg2Rad)
 			{
 				downVector = playerPos - downBoomerangWorldTransform[0].translation_;
 				downVector.normalize();
+			}
+			else
+			{
+				downVector = { 1,0,1 };
 			}
 
 			downBoomerangWorldTransform[0].translation_.x += downVector.x;
@@ -366,9 +445,9 @@ void BossPhase_2::boomerangUpdate(Vector3 playerPos)
 			float BR;
 
 			AR = pow((downBoomerangWorldTransform[0].translation_.x), 2) + pow((downBoomerangWorldTransform[0].translation_.z), 2);
-			BR = pow((100 - downBoomerangWorldTransform[0].scale_.x * 1.5), 2);
+			BR = pow((120 - downBoomerangWorldTransform[0].scale_.x * 1.5), 2);
 
-			if (AR > BR && downBoomerangWorldTransform[0].rotation_.y >= 36000.0f * affine::Deg2Rad)
+			if (AR > BR && downBoomerangWorldTransform[0].rotation_.y >= 12000.0f * affine::Deg2Rad)
 			{
 				isDownAttack = false;
 
@@ -389,6 +468,7 @@ void BossPhase_2::boomerangUpdate(Vector3 playerPos)
 			if (worldTransform_[14].translation_.y <= -kyubuLengh)
 			{
 				isDownActive = false;
+				isAction = Action::AttackInterval;
 				downBoomerangWorldTransform[0].rotation_.y = 0;
 			}
 		}
@@ -409,9 +489,9 @@ void BossPhase_2::boomerangUpdate(Vector3 playerPos)
 	debugText_->Printf("translation_:%f,%f,%f", downBoomerangWorldTransform[0].translation_.x, downBoomerangWorldTransform[0].translation_.y, upBoomerangWorldTransform[0].translation_.z);
 }
 
-void BossPhase_2::boomerangSet(Vector3 playerPos)
+void BossPhase_2::boomerangSet(Vector3 playerPos,bool UpOrDown)
 {
-	if (isUpActive == false && input_->TriggerKey(DIK_2))
+	if (UpOrDown==true)
 	{
 		upBoomerangWorldTransform[0].translation_ = worldTransform_[0].translation_;
 		upBoomerangWorldTransform[0].translation_.y = worldTransform_[0].translation_.y + kyubuLengh;
@@ -436,7 +516,7 @@ void BossPhase_2::boomerangSet(Vector3 playerPos)
 
 		worldTransform_[0].rotation_.x = 0;
 	}
-	if (isDownActive == false && input_->TriggerKey(DIK_4))
+	if (UpOrDown == false)
 	{
 		downBoomerangWorldTransform[0].translation_ = worldTransform_[0].translation_;
 		downBoomerangWorldTransform[0].translation_.y = worldTransform_[0].translation_.y - kyubuLengh;
@@ -477,7 +557,6 @@ void BossPhase_2::rushReset()
 
 void BossPhase_2::DeathblowUp()
 {
-	std::srand(time(NULL));
 	if (blowUpFlag == true) {
 		if (blowUpSetFlag == false) {
 			for (int i = 0; i < 19; i++) {
@@ -644,6 +723,7 @@ void BossPhase_2::rushUpdate(Vector3 playerPos)
 				angle = abs(angle);
 
 				rushFlag = false;
+				isAction = Action::AttackInterval;
 			}
 		}
 		debugText_->SetPos(20, 140);

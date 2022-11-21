@@ -17,6 +17,12 @@ public:// サブクラス
 		rush,
 		reflector,
 	};
+	enum class Action
+	{
+		AttackInterval,
+		AttackSelection,
+		AttackInMotion
+	};
 
 public:// メンバ関数
 	// 初期化関数
@@ -34,6 +40,8 @@ public:// メンバ関数
 	bool GetBeamFrag() { return beamOBJSetFlag; }
 
 	bool GetBoomerangflg(bool UpOrDown);
+
+	void SetIsDead(bool isDead) { blowUpFlag = isDead; }
 
 	WorldTransform GetPos() { return worldTransform_[0]; }
 
@@ -85,7 +93,7 @@ private:
 	void TurnRushToPlayer(Vector3 playerPos);
 
 	//ブーメラン関連のセット
-	void  boomerangSet(Vector3 playerPos);
+	void  boomerangSet(Vector3 playerPos,bool UpOrDown);
 
 	// 突進のリセット関数
 	void rushReset();
@@ -118,6 +126,13 @@ private:// メンバ変数
 
 	int maxHP = 10;
 	int HP = maxHP;
+
+	Action isAction= Action::AttackInterval;
+	const int maxIntervalFrame=200;
+	int intervalFrame;
+	int randAttack=0;
+	int Attack=0;
+	int oldAttack=0;
 
 	// ビーム用の変数
 	#pragma region ビーム用の変数
@@ -165,6 +180,10 @@ private:// メンバ変数
 
 	// 消すときのフラグ
 	bool AnnihilationFlag[27];
+
+	Model* torunedoModel_ = nullptr;
+
+	WorldTransform torunedoTrans;
 
 	//上のブーメラン用ワールドトランスフォーム
 	WorldTransform upBoomerangWorldTransform[5];

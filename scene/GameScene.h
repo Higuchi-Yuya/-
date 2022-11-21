@@ -78,6 +78,8 @@ class GameScene {
 
 	bool calcRaySphere(Vector3 l,Vector3 v,	Vector3 p,float r);
 
+	void AnimationCameraUpdate();
+
 	//シェイク関数
 	Vector3 Shake(const Vector3& firstPos, int& shakeCount);
 

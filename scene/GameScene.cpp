@@ -56,9 +56,9 @@ void GameScene::Initialize() {
 	cameraPos[Title].y -= 5.5f;
 	cameraPos[GameStart] = railCamera_->GetViewProjection().eye;
 	//cameraPos[GameStart].z -= 50.0f;
-	cameraPos[GameBossTrans] = Vector3(0, 5, 50);
-	cameraPos[GameBossTrans] = cameraPos[Title];
-	cameraPos[GameBossDeath];
+	cameraPos[GameBossTrans] = bossPhase_1->GetWorldTransformP().translation_;
+	cameraPos[GameBossTrans].z -= 50.0f;
+	//cameraPos[GameBossDeath];
 
 	titleCamera.Initialize();
 	titleCamera.eye = cameraPos[Title];
@@ -73,73 +73,23 @@ void GameScene::Initialize() {
 	titleUITexture = TextureManager::Load("PressAStart.png");
 
 	//スプライト生成
-	titleSprite = Sprite::Create(titleTexture, { WinApp::kWindowWidth/2,256 });
+	titleSprite = Sprite::Create(titleTexture, { WinApp::kWindowWidth / 2,256 });
 	titleUISprite = Sprite::Create(titleUITexture, { WinApp::kWindowWidth / 2,WinApp::kWindowHeight - 64 });
 
-	titleSprite->SetAnchorPoint(Vector2( 0.5f,0.3f ));
+	titleSprite->SetAnchorPoint(Vector2(0.5f, 0.3f));
 	titleUISprite->SetAnchorPoint(Vector2(0.5f, 1));
-	titleUISprite->SetSize(Vector2(784 * 3 / 10, 288* 3 / 10));
+	titleUISprite->SetSize(Vector2(784 * 3 / 10, 288 * 3 / 10));
 	titleSprite->SetSize(Vector2(688 * 9 / 10, 336 * 9 / 10));
-	
+
 
 }
 
 void GameScene::Update() {
 	player_->Update();
 	railCamera_->Update();
+	cameraPos[GameStart] = railCamera_->GetViewProjection().eye;
 
-	if (input_->PushKey(DIK_8)) {
-		animeTimer = 0;
-		animetionPhase = TitleToGame;
-	}
-
-	if (input_->PushKey(DIK_9)) {
-		animeTimer = 0;
-		animetionPhase = Phase::Boss1To2;
-		cameraShakeCount = 49;
-	}
-
-
-
-	if (animetionPhase == TitleToGame) {
-
-		animeTimer += 0.025f;
-
-		if (animeTimer >= 1) {
-			animeTimer = 1;
-		}
-
-		Vector3 pos;
-		pos = pos.lerp(cameraPos[Title], cameraPos[GameStart], animeTimer);
-
-		titleCamera.eye = pos;
-		titleCamera.target = Vector3(pos.x, pos.y, pos.z + 5.0f);
-		titleCamera.UpdateMatrix();
-
-	}
-	else if (animetionPhase == Boss1To2) {
-		if (animeTimer < 50.0f) {
-			animeTimer++;
-			titleCamera.eye = Shake(cameraPos[GameBossTrans], cameraShakeCount);
-		}
-		else if (animeTimer >= 50.0f) {
-			animeTimer += 0.025f;
-			if (animeTimer >= 53) {
-				animeTimer = 53;
-			}
-			Vector3 pos;
-			float easeTime = animeTimer - 52;
-			if (easeTime >= 0) {
-				pos = pos.lerp(cameraPos[GameBossTrans], cameraPos[GameStart], easeTime);
-				titleCamera.eye = pos;
-			}
-		}
-		titleCamera.target = Vector3(titleCamera.eye.x, titleCamera.eye.y, titleCamera.eye.z + 5.0f);
-		titleCamera.UpdateMatrix();
-	}
-
-	debugText_->SetPos(50, 190);
-	debugText_->Printf("animeTimer:%1.5f", animeTimer);
+	AnimationCameraUpdate();
 
 	// ボスのフェーズ1の更新
 	bossPhase_1->TitleUpdate();
@@ -187,7 +137,7 @@ void GameScene::Draw() {
 
 	// ボスフェーズ2の描画
 	//if (animetionPhase >= Phase::Boss1To2) {
-		bossPhase_2->Draw(railCamera_->GetViewProjection());
+	bossPhase_2->Draw(railCamera_->GetViewProjection());
 	//}
 
 	//// ボスフェーズ3の描画
@@ -213,7 +163,7 @@ void GameScene::Draw() {
 
 
 	// デバッグテキストの描画
-	//debugText_->DrawAll(commandList);
+	debugText_->DrawAll(commandList);
 	//
 	// スプライト描画後処理
 	Sprite::PostDraw();
@@ -397,6 +347,90 @@ bool GameScene::calcRaySphere(
 		return false; // レイの反対で衝突
 
 	return true;
+}
+
+void GameScene::AnimationCameraUpdate()
+{
+	if (input_->PushKey(DIK_8)) {
+		animeTimer = 0;
+		animetionPhase = TitleToGame;
+	}
+
+	if (input_->PushKey(DIK_9)) {
+		animeTimer = 0;
+		animetionPhase = Phase::Boss1To2;
+		cameraShakeCount = 49;
+	}
+
+	if (input_->PushKey(DIK_7)) {
+		animeTimer = 0;
+		animetionPhase = Phase::GameToResult;
+		//ボスを死亡
+		bossPhase_2->SetIsDead(true);
+	}
+
+
+	if (animetionPhase == TitleToGame) {
+
+		animeTimer += 0.025f;
+		if (animeTimer >= 1) {
+			animeTimer = 1;
+		}
+		Vector3 pos, target;
+		pos = pos.lerp(cameraPos[Title], cameraPos[GameStart], animeTimer);
+		target = target.lerp(Vector3(cameraPos[Title].x, cameraPos[Title].y, cameraPos[Title].z + 5.0f), railCamera_->GetViewProjection().target, animeTimer);
+		titleCamera.eye = pos;
+		titleCamera.target = target;
+		
+	}
+	else if (animetionPhase == Boss1To2) {
+		if (animeTimer < 50.0f) {
+			animeTimer++;
+			titleCamera.eye = Shake(cameraPos[GameBossTrans], cameraShakeCount);
+			titleCamera.target = bossPhase_1->GetWorldTransformP().translation_;
+		}
+		else if (animeTimer >= 50.0f) {
+			animeTimer += 0.025f;
+			if (animeTimer >= 53) {
+				animeTimer = 53;
+			}
+			Vector3 pos;
+			float easeTime = animeTimer - 52;
+			if (easeTime >= 0) {
+				pos = pos.lerp(cameraPos[GameBossTrans], cameraPos[GameStart], easeTime);
+				titleCamera.eye = pos;
+			}
+		}
+		titleCamera.target = Vector3(titleCamera.eye.x, titleCamera.eye.y, titleCamera.eye.z + 5.0f);
+	}
+	else if (animetionPhase == Phase::GameToResult) {
+		animeTimer++;
+		float cameraDistance = 25.0f;
+		Vector3 eye{}, target;
+		target = bossPhase_2->GetPos().translation_;
+		//eye = target;
+	//	eye.z += cos(MathUtility::PI / 180 * 45) * cameraDistance;
+	////	eye.y += cos(MathUtility::PI / 180 * 45) * cameraDistance;
+	//	eye.x += sin(MathUtility::PI / 180 * 45) * cameraDistance;
+		titleCamera.eye = eye;
+		titleCamera.target = bossPhase_2->GetPos().translation_;
+
+
+
+	}
+	titleCamera.eye = Vector3(0, 20, 0);
+	titleCamera.target.x = bossPhase_2->GetPos().matWorld_.m[3][0];
+	titleCamera.target.y = bossPhase_2->GetPos().matWorld_.m[3][1];
+	titleCamera.target.z = bossPhase_2->GetPos().matWorld_.m[3][2];
+
+	titleCamera.UpdateMatrix();
+
+	debugText_->SetPos(50, 150);
+	debugText_->Printf("bossPosition:%1.4f,%1.4f,%1.4f", bossPhase_2->GetPos().translation_.x, bossPhase_2->GetPos().translation_.y, bossPhase_2->GetPos().translation_.z);
+	debugText_->SetPos(50, 170);
+	debugText_->Printf("cameraTarget:%1.4f,%1.4f,%1.4f", titleCamera.target.x, titleCamera.target.y, titleCamera.target.z);
+	debugText_->SetPos(50, 190);
+	debugText_->Printf("animeTimer:%1.5f", animeTimer);
 }
 
 Vector3 GameScene::Shake(const Vector3& firstPos, int& shakeCount)
