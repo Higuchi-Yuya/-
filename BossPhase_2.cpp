@@ -101,62 +101,64 @@ void BossPhase_2::Update(Vector3 playerPos)
 			angle = 0;
 		}
 	}
-
-	std::srand(time(NULL));
-	if (rushFlag == false && isUpActive == false && isDownActive == false && beamFlag == false&&isAction==Action::AttackInterval)
+	if (blowUpFlag == false)
 	{
-		intervalFrame++;
-		if (intervalFrame >= maxIntervalFrame)
+		std::srand(time(NULL));
+		if (rushFlag == false && isUpActive == false && isDownActive == false && beamFlag == false && isAction == Action::AttackInterval)
 		{
-			intervalFrame = 0;
-			isAction = Action::AttackSelection;
-		}
-	}
-	if (rushFlag == false && isUpActive == false && isDownActive == false&&beamFlag==false&& isAction == Action::AttackSelection)
-	{
-		do
-		{
-			beamFlag == false;
-			isUpActive == false;
-			isDownActive = false;
-			rushFlag = false;
-			randAttack = rand();
-			randAttack %= 100;
-			if (randAttack < 25)
+			intervalFrame++;
+			if (intervalFrame >= maxIntervalFrame)
 			{
-				Attack = 1;
+				intervalFrame = 0;
+				isAction = Action::AttackSelection;
 			}
-			if (randAttack >= 25 && randAttack < 50)
+		}
+		if (rushFlag == false && isUpActive == false && isDownActive == false && beamFlag == false && isAction == Action::AttackSelection)
+		{
+			do
 			{
-				Attack = 2;
-			}
-			if (randAttack >= 50 && randAttack < 75)
+				beamFlag == false;
+				isUpActive == false;
+				isDownActive = false;
+				rushFlag = false;
+				randAttack = rand();
+				randAttack %= 100;
+				if (randAttack < 25)
+				{
+					Attack = 1;
+				}
+				if (randAttack >= 25 && randAttack < 50)
+				{
+					Attack = 2;
+				}
+				if (randAttack >= 50 && randAttack < 75)
+				{
+					Attack = 3;
+				}
+				if (randAttack >= 75 && randAttack < 100)
+				{
+					Attack = 4;
+				}
+			} while (Attack == oldAttack);
+			oldAttack = Attack;
+			if (Attack == 1)
 			{
-				Attack = 3;
+				beamReset();
 			}
-			if (randAttack >= 75 && randAttack < 100)
+			if (Attack == 2)
 			{
-				Attack = 4;
+				rushReset();
 			}
-		} while (Attack == oldAttack);
-		oldAttack = Attack;
-		if (Attack == 1)
-		{
-			beamReset();
+			if (Attack == 3)
+			{
+				boomerangSet(playerPos, true);
+			}
+			if (Attack == 4)
+			{
+				boomerangSet(playerPos, false);
+			}
+			isAction = Action::AttackInMotion;
 		}
-		if (Attack == 2)
-		{
-			rushReset();
-		}
-		if (Attack == 3)
-		{
-			boomerangSet(playerPos,true);
-		}
-		if (Attack == 4)
-		{
-			boomerangSet(playerPos,false);
-		}
-		isAction = Action::AttackInMotion;
 	}
 
 
@@ -171,6 +173,10 @@ void BossPhase_2::Update(Vector3 playerPos)
 	if (input_->TriggerKey(DIK_6))
 	{
 		blowUpFlag = true;
+		beamFlag == false;
+		isUpActive == false;
+		isDownActive = false;
+		rushFlag = false;
 	}
 
 
@@ -179,11 +185,14 @@ void BossPhase_2::Update(Vector3 playerPos)
 
 	}
 
-	boomerangUpdate(playerPos);
+	if (blowUpFlag == false)
+	{
+		boomerangUpdate(playerPos);
 
-	beamUpdate(playerPos);
+		beamUpdate(playerPos);
 
-	rushUpdate(playerPos);
+		rushUpdate(playerPos);
+	}
 
 	DeathblowUp();
 
@@ -365,9 +374,9 @@ void BossPhase_2::boomerangUpdate(Vector3 playerPos)
 		}
 		else if (isUpAttack == true)
 		{
-			upBoomerangWorldTransform[0].translation_.x += upVector.x * 5;
-			upBoomerangWorldTransform[0].translation_.y += upVector.y * 5;
-			upBoomerangWorldTransform[0].translation_.z += upVector.z * 5;
+			upBoomerangWorldTransform[0].translation_.x += upVector.x * 2;
+			upBoomerangWorldTransform[0].translation_.y += upVector.y * 2;
+			upBoomerangWorldTransform[0].translation_.z += upVector.z * 2;
 
 			torunedoTrans.translation_ = upBoomerangWorldTransform[0].translation_;
 			torunedoTrans.translation_.y = 0;
