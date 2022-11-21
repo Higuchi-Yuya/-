@@ -117,6 +117,7 @@ class GameScene {
 	Sprite* titleSprite = nullptr;
 	Sprite* titleUISprite = nullptr;
 
+	ViewProjection *viewProjection=nullptr;
 	/// <summary>
 	/// ゲームシーン用
 	/// </summary>
