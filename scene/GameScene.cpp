@@ -41,7 +41,6 @@ void GameScene::Initialize() {
 	bossPhase_3 = std::make_unique<BossPhase_3>();
 	bossPhase_3->Initialize();
 
-
 	player_ = std::make_unique<player>();
 	railCamera_ = std::make_unique<RailCamera>();
 	sky_ = std::make_unique<sky>();
@@ -49,6 +48,7 @@ void GameScene::Initialize() {
 	sky_->Initialize();
 	player_->Initialize();
 	railCamera_->Initialize(Vector3(0, 5, -50), Vector3(0, 0, 0), player_->GetWorldTransform());
+	viewProjection = &railCamera_->GetViewProjection();
 
 	//カメラ初期座標の初期化
 	cameraPos[Title] = bossPhase_1->GetWorldTransformP().translation_;
@@ -85,6 +85,16 @@ void GameScene::Initialize() {
 }
 
 void GameScene::Update() {
+
+	if (input_->TriggerKey(DIK_0))
+	{
+		viewProjection=&railCamera_->GetViewProjection();
+	}
+	if (input_->TriggerKey(DIK_5))
+	{
+		viewProjection = &titleCamera;
+	}
+
 	player_->Update();
 	railCamera_->Update();
 	cameraPos[GameStart] = railCamera_->GetViewProjection().eye;
@@ -129,21 +139,21 @@ void GameScene::Draw() {
 
 	/// <summary>
 	/// ここに3Dオブジェクトの描画処理を追加できる
-	model_->Draw(worldTransform, titleCamera);
-	player_->Draw(titleCamera);
+	model_->Draw(worldTransform, *viewProjection);
+	player_->Draw(*viewProjection);
 
 	//// ボスフェーズ1の描画
-	bossPhase_1->Draw(titleCamera);
+	bossPhase_1->Draw(*viewProjection);
 
 	// ボスフェーズ2の描画
 	//if (animetionPhase >= Phase::Boss1To2) {
-	bossPhase_2->Draw(titleCamera);
+	bossPhase_2->Draw(*viewProjection);
 	//}
 
 	//// ボスフェーズ3の描画
 	//bossPhase_3->Draw(railCamera_->GetViewProjection());
 
-	sky_->Draw(titleCamera);
+	sky_->Draw(*viewProjection);
 	/// </summary>
 
 	// 3Dオブジェクト描画後処理
