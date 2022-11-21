@@ -442,11 +442,11 @@ void GameScene::AnimationCameraUpdate()
 			//1つめの座標はいま使っている座標
 			cameraPos[GameBossDeath] = eye;
 			//2つめの座標(補間の終点)はプレイヤー座標参照
-			float rota2 =  135.0f;
+			float rota2 =  75.0f;
 			Vector3 nextEye{
-				-cos(MathUtility::PI / 180 * 105.0f) * cameraDistance/2 ,
+				-cos(MathUtility::PI / 180 * rota2) * cameraDistance/2 ,
 				0,
-				-sin(MathUtility::PI / 180 * 105.0f) * cameraDistance/2  };
+				-sin(MathUtility::PI / 180 * rota2) * cameraDistance/2  };
 			cameraPos[GameBossDeath2] = MathUtility::Vector3Transform(nextEye,player_->GetWorldTransform()->matWorld_);
 		}
 		else {
