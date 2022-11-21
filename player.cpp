@@ -28,6 +28,15 @@ void player::Update() {
 		return bullet->IsDead();
 		});
 
+	if (isDamageInterval==true)
+	{
+		damageInterval--;
+		if (damageInterval<=0)
+		{
+			isDamageInterval = false;
+		}
+	}
+
 	//自機のワールド座標から移動ベクトルを計算
 	Vector3 vectorX = { 1.0,0,0 };
 	vectorX = affine::MatVector(worldTransform_.matWorld_, vectorX);
@@ -124,6 +133,9 @@ void player::Update() {
 
 	debugText_->SetPos(10, 30);
 	debugText_->Printf("%f,%f,%f", worldTransform_.translation_.x, worldTransform_.translation_.y,worldTransform_.translation_.z);*/
+
+	debugText_->SetPos(10, 110);
+	debugText_->Printf("playerHP%d", HP);
 }
 
 void player::Attack() {
@@ -154,7 +166,17 @@ void player::Attack() {
 }
 
 void player::Draw(ViewProjection& viewProjection_) {
-	model_->Draw(worldTransform_, viewProjection_);
+	if (isDamageInterval==false)
+	{
+		model_->Draw(worldTransform_, viewProjection_);
+	}
+	else
+	{
+		if (damageInterval%3==0)
+		{
+			model_->Draw(worldTransform_, viewProjection_);
+		}
+	}
 
 	/*model_->Draw(worldTransform3DReticle_, viewProjection_, textureHandle_);*/
 	//弾描画
@@ -177,7 +199,12 @@ Vector3 player::GetworldPosition()
 }
 void player::OnCollision()
 {
-
+	if (isDamageInterval==false)
+	{
+		HP--;
+		isDamageInterval = true;
+		damageInterval = 60 * 5;
+	}
 }
 void player::jump()
 {

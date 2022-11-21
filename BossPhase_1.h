@@ -96,5 +96,8 @@ private:// メンバ変数
 
 	//タイトル挙動用回転角
 	float titleRadian = 0;
+
+	int maxHP = 10;
+	int HP = maxHP;
 };
 

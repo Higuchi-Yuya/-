@@ -116,6 +116,9 @@ private:// メンバ変数
 
 	Vector3 playerPos_;
 
+	int maxHP = 10;
+	int HP = maxHP;
+
 	// ビーム用の変数
 	#pragma region ビーム用の変数
 	// ビームのワールドデータ

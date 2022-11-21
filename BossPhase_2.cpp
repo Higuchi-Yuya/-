@@ -125,6 +125,9 @@ void BossPhase_2::Update(Vector3 playerPos)
 	DeathblowUp();
 
 	TransferMat();
+
+	debugText_->SetPos(10, 90);
+	debugText_->Printf("boss2HP%d", HP);
 }
 
 void BossPhase_2::Draw(ViewProjection viewprojection)
@@ -158,6 +161,7 @@ void BossPhase_2::Draw(ViewProjection viewprojection)
 
 void BossPhase_2::OnCollision()
 {
+	HP--;
 }
 
 bool BossPhase_2::GetBoomerangflg(bool UpOrDown)
