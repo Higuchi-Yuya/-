@@ -405,12 +405,18 @@ void GameScene::AnimationCameraUpdate()
 		titleCamera.target = Vector3(titleCamera.eye.x, titleCamera.eye.y, titleCamera.eye.z + 5.0f);
 	}
 	else if (animetionPhase == Phase::GameToResult) {
+		//プレイヤーを敵に向かせる
+		float playerRota = bossPhase_2->GetPos().rotation_.y + 180.0f;
+		
+		//プレイヤーのY軸回転を設定する
+		//player_->
+
 		if (animeTimer < 425) {
 			animeTimer++;
 			//注視点からカメラの距離
 			float cameraDistance = 40.0f;
 			//カメラ回転角
-			float cameraRotation = bossPhase_2->GetPos().rotation_.y + -30.0f;
+			float cameraRotation = 30.0f;
 			Vector3 eye{}, target;
 			//注視点はボス2に
 			target = bossPhase_2->GetPos().translation_;
@@ -426,15 +432,15 @@ void GameScene::AnimationCameraUpdate()
 			//1つめの座標はいま使っている座標
 			cameraPos[GameBossDeath] = eye;
 			//2つめの座標(補間の終点)はプレイヤー座標参照
-			float rota2 =  90.0f;
+			float rota2 =  135.0f;
 			Vector3 nextEye{
-				cos(MathUtility::PI / 180 * rota2) * cameraDistance,
-5,
-				sin(MathUtility::PI / 180 * rota2) * cameraDistance };
+				-cos(MathUtility::PI / 180 * 105.0f) * cameraDistance/2 ,
+				0,
+				-sin(MathUtility::PI / 180 * 105.0f) * cameraDistance/2  };
 			cameraPos[GameBossDeath2] = MathUtility::Vector3Transform(nextEye,player_->GetWorldTransform()->matWorld_);
 		}
 		else {
-			animeTimer += 0.025f;
+			animeTimer += 0.0125f;
 			float easeTime = animeTimer - 425;
 			if (animeTimer >= 426) {
 				animeTimer = 426;
@@ -444,7 +450,7 @@ void GameScene::AnimationCameraUpdate()
 			Vector3 pos1, pos2;
 			pos1 = Vector3(boss2Mat.m[3][0], boss2Mat.m[3][1], boss2Mat.m[3][2]);
 			pos2 = player_->GetWorldTransform()->translation_;
-			target = target.lerp(pos1, pos2, easeTime);
+			target = target.lerp(pos1, pos2, easeTime/2);
 
 			titleCamera.eye = eye;
 			titleCamera.target = target;

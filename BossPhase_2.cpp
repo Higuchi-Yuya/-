@@ -613,7 +613,7 @@ void BossPhase_2::DeathblowUp()
 			// —Ž‰ºˆ—
 			if (medamaDownFlag == true) {
 				medamawaitTimer++;
-				if (medamawaitTimer >= 0.8 * 60) {
+				if (medamawaitTimer >= 2.5f * 60) {
 					medamaGraviti += 0.03;
 					medamaWT.translation_.y -= medamaGraviti;
 				}
