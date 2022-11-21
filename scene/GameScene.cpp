@@ -137,7 +137,7 @@ void GameScene::Draw() {
 
 	// ボスフェーズ2の描画
 	//if (animetionPhase >= Phase::Boss1To2) {
-	bossPhase_2->Draw(railCamera_->GetViewProjection());
+	bossPhase_2->Draw(titleCamera);
 	//}
 
 	//// ボスフェーズ3の描画
@@ -367,6 +367,7 @@ void GameScene::AnimationCameraUpdate()
 		animetionPhase = Phase::GameToResult;
 		//ボスを死亡
 		bossPhase_2->SetIsDead(true);
+		boss2Mat = bossPhase_2->GetPos().matWorld_;
 	}
 
 
@@ -381,7 +382,7 @@ void GameScene::AnimationCameraUpdate()
 		target = target.lerp(Vector3(cameraPos[Title].x, cameraPos[Title].y, cameraPos[Title].z + 5.0f), railCamera_->GetViewProjection().target, animeTimer);
 		titleCamera.eye = pos;
 		titleCamera.target = target;
-		
+
 	}
 	else if (animetionPhase == Boss1To2) {
 		if (animeTimer < 50.0f) {
@@ -404,24 +405,51 @@ void GameScene::AnimationCameraUpdate()
 		titleCamera.target = Vector3(titleCamera.eye.x, titleCamera.eye.y, titleCamera.eye.z + 5.0f);
 	}
 	else if (animetionPhase == Phase::GameToResult) {
-		animeTimer++;
-		float cameraDistance = 25.0f;
-		Vector3 eye{}, target;
-		target = bossPhase_2->GetPos().translation_;
-		//eye = target;
-	//	eye.z += cos(MathUtility::PI / 180 * 45) * cameraDistance;
-	////	eye.y += cos(MathUtility::PI / 180 * 45) * cameraDistance;
-	//	eye.x += sin(MathUtility::PI / 180 * 45) * cameraDistance;
-		titleCamera.eye = eye;
-		titleCamera.target = bossPhase_2->GetPos().translation_;
+		if (animeTimer < 425) {
+			animeTimer++;
+			//注視点からカメラの距離
+			float cameraDistance = 40.0f;
+			//カメラ回転角
+			float cameraRotation = bossPhase_2->GetPos().rotation_.y + -30.0f;
+			Vector3 eye{}, target;
+			//注視点はボス2に
+			target = bossPhase_2->GetPos().translation_;
+			//目を45度回転
+			eye.z -= cos(MathUtility::PI / 180 * cameraRotation) * cameraDistance;
+			eye.x -= sin(MathUtility::PI / 180 * cameraRotation) * cameraDistance;
+			//ボス2の座標を使ってワールド座標返還
+			eye = MathUtility::Vector3Transform(eye, boss2Mat);
+			//使うカメラに代入
+			titleCamera.eye = eye;
+			titleCamera.target = bossPhase_2->GetPos().translation_;
+			//後の線形補間で使う用の変数に値を入れる
+			//1つめの座標はいま使っている座標
+			cameraPos[GameBossDeath] = eye;
+			//2つめの座標(補間の終点)はプレイヤー座標参照
+			float rota2 =  90.0f;
+			Vector3 nextEye{
+				cos(MathUtility::PI / 180 * rota2) * cameraDistance,
+5,
+				sin(MathUtility::PI / 180 * rota2) * cameraDistance };
+			cameraPos[GameBossDeath2] = MathUtility::Vector3Transform(nextEye,player_->GetWorldTransform()->matWorld_);
+		}
+		else {
+			animeTimer += 0.025f;
+			float easeTime = animeTimer - 425;
+			if (animeTimer >= 426) {
+				animeTimer = 426;
+			}
+			Vector3 eye, target;
+			eye = eye.lerp(cameraPos[GameBossDeath], cameraPos[GameBossDeath2], easeTime);
+			Vector3 pos1, pos2;
+			pos1 = Vector3(boss2Mat.m[3][0], boss2Mat.m[3][1], boss2Mat.m[3][2]);
+			pos2 = player_->GetWorldTransform()->translation_;
+			target = target.lerp(pos1, pos2, easeTime);
 
-
-
+			titleCamera.eye = eye;
+			titleCamera.target = target;
+		}
 	}
-	titleCamera.eye = Vector3(0, 20, 0);
-	titleCamera.target.x = bossPhase_2->GetPos().matWorld_.m[3][0];
-	titleCamera.target.y = bossPhase_2->GetPos().matWorld_.m[3][1];
-	titleCamera.target.z = bossPhase_2->GetPos().matWorld_.m[3][2];
 
 	titleCamera.UpdateMatrix();
 
@@ -429,7 +457,7 @@ void GameScene::AnimationCameraUpdate()
 	debugText_->Printf("bossPosition:%1.4f,%1.4f,%1.4f", bossPhase_2->GetPos().translation_.x, bossPhase_2->GetPos().translation_.y, bossPhase_2->GetPos().translation_.z);
 	debugText_->SetPos(50, 170);
 	debugText_->Printf("cameraTarget:%1.4f,%1.4f,%1.4f", titleCamera.target.x, titleCamera.target.y, titleCamera.target.z);
-	debugText_->SetPos(50, 190);
+	debugText_->SetPos(50, 185);
 	debugText_->Printf("animeTimer:%1.5f", animeTimer);
 }
 

@@ -23,6 +23,7 @@ enum PositionIndex {
 	GameStart,//ゲーム開始
 	GameBossTrans,//ボス変身
 	GameBossDeath,//ボス死亡
+	GameBossDeath2,//ボス死亡
 	
 	PositionIndexCount,//インデックス総数
 };
@@ -105,6 +106,7 @@ class GameScene {
 	//カメラ座標
 	Vector3 cameraPos[PositionIndexCount];
 	ViewProjection titleCamera;
+	Matrix4 boss2Mat;
 	float animeTimer = 0;
 
 	int animetionPhase = 0;
