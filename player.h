@@ -81,5 +81,12 @@ private:
 
 	float gravitySpeed = 1.5;
 	float defGravitySpeed = gravitySpeed;
+
+	int maxHP = 3;
+	int HP = maxHP;
+
+	bool isDamageInterval;
+
+	int damageInterval;
 };
 

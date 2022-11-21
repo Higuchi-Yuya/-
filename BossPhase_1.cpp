@@ -84,6 +84,9 @@ void BossPhase_1::Update(Vector3 playerPos)
 
 	// s—ñ‚ÌXV‚Æ“]‘—
 	TransferMat();
+
+	debugText_->SetPos(10,70);
+	debugText_->Printf("boss1HP%d",HP);
 }
 
 void BossPhase_1::TitleUpdate()
@@ -120,7 +123,7 @@ void BossPhase_1::Draw(ViewProjection viewprojection)
 
 void BossPhase_1::OnCollision()
 {
-
+	HP--;
 }
 
 void BossPhase_1::FlyBlocks(Vector3 playerPos)
