@@ -6,7 +6,7 @@ void BossPhase_1::Initialize()
 
 	input_ = Input::GetInstance();
 
-	model_ = Model::Create();
+	model_ = Model::CreateFromOBJ("BossCube");
 
 	for (int i = 0; i < 27; i++) {
 
@@ -89,13 +89,13 @@ void BossPhase_1::Update(Vector3 playerPos)
 void BossPhase_1::TitleUpdate()
 {
 	//‰¡‚É‰ñ“]‚µ‚È‚ª‚ç•‚—V
-	titleRadian += 0.5f;
+	titleRadian += 0.75f;
 	if (titleRadian >= 360.0f) {
 		titleRadian -= 360.0f;
 	}
 
 	worldTransform_[0].rotation_.y =  MathUtility::PI / 180* titleRadian;
-	worldTransform_[0].translation_.y = (sin(MathUtility::PI / 180 * titleRadian) * 3.0f) + 10;
+	worldTransform_[0].translation_.y = (sin(MathUtility::PI / 180 * titleRadian) * 2.0f) + 12;
 
 	debugText_->SetPos(50, 90);
 	debugText_->Printf("boss1:translation:%1.4f,%1.4f,%1.4f", worldTransform_[0].translation_.x, worldTransform_[0].translation_.y, worldTransform_[0].translation_.z);

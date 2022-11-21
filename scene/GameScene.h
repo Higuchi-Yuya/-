@@ -108,6 +108,11 @@ class GameScene {
 	int animetionPhase = 0;
 	int cameraShakeCount = 0;
 
+	uint32_t titleTexture = 0;
+	uint32_t titleUITexture = 0;
+	Sprite* titleSprite = nullptr;
+	Sprite* titleUISprite = nullptr;
+
 	/// <summary>
 	/// ゲームシーン用
 	/// </summary>

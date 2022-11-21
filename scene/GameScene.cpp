@@ -9,6 +9,8 @@ GameScene::GameScene() {}
 
 GameScene::~GameScene() {
 	delete model_;
+	delete titleSprite;
+	delete titleUISprite;
 }
 
 void GameScene::Initialize() {
@@ -50,10 +52,11 @@ void GameScene::Initialize() {
 
 	//カメラ初期座標の初期化
 	cameraPos[Title] = bossPhase_1->GetWorldTransformP().translation_;
-	cameraPos[Title].z -= 50.0f;
+	cameraPos[Title].z -= 35.0f;
+	cameraPos[Title].y -= 5.5f;
 	cameraPos[GameStart] = railCamera_->GetViewProjection().eye;
 	//cameraPos[GameStart].z -= 50.0f;
-	cameraPos[GameBossTrans] = Vector3(0,5,50);
+	cameraPos[GameBossTrans] = Vector3(0, 5, 50);
 	cameraPos[GameBossTrans] = cameraPos[Title];
 	cameraPos[GameBossDeath];
 
@@ -64,6 +67,21 @@ void GameScene::Initialize() {
 	animeTimer = 0;
 
 	animetionPhase = Phase::TitleToGame;
+
+	//タイトル用テクスチャ読み込み
+	titleTexture = TextureManager::Load("Title.png");
+	titleUITexture = TextureManager::Load("PressAStart.png");
+
+	//スプライト生成
+	titleSprite = Sprite::Create(titleTexture, { WinApp::kWindowWidth/2,256 });
+	titleUISprite = Sprite::Create(titleUITexture, { WinApp::kWindowWidth / 2,WinApp::kWindowHeight - 64 });
+
+	titleSprite->SetAnchorPoint(Vector2( 0.5f,0.3f ));
+	titleUISprite->SetAnchorPoint(Vector2(0.5f, 1));
+	titleUISprite->SetSize(Vector2(784 * 3 / 10, 288* 3 / 10));
+	titleSprite->SetSize(Vector2(688 * 9 / 10, 336 * 9 / 10));
+	
+
 }
 
 void GameScene::Update() {
@@ -78,7 +96,7 @@ void GameScene::Update() {
 	if (input_->PushKey(DIK_9)) {
 		animeTimer = 0;
 		animetionPhase = Phase::Boss1To2;
-		cameraShakeCount =49;
+		cameraShakeCount = 49;
 	}
 
 
@@ -124,8 +142,8 @@ void GameScene::Update() {
 	debugText_->Printf("animeTimer:%1.5f", animeTimer);
 
 	// ボスのフェーズ1の更新
-	/*bossPhase_1->TitleUpdate();*/
-	bossPhase_1->Update(player_->GetworldPosition());
+	bossPhase_1->TitleUpdate();
+	//bossPhase_1->Update(player_->GetworldPosition());
 
 	// ボスのフェーズ2の更新
 	bossPhase_2->Update(player_->GetworldPosition());
@@ -168,9 +186,9 @@ void GameScene::Draw() {
 	bossPhase_1->Draw(titleCamera);
 
 	// ボスフェーズ2の描画
-	if (animetionPhase >= Phase::Boss1To2) {
+	//if (animetionPhase >= Phase::Boss1To2) {
 		bossPhase_2->Draw(railCamera_->GetViewProjection());
-	}
+	//}
 
 	//// ボスフェーズ3の描画
 	//bossPhase_3->Draw(railCamera_->GetViewProjection());
@@ -190,8 +208,12 @@ void GameScene::Draw() {
 	/// ここに前景スプライトの描画処理を追加できる
 	/// </summary>
 
+	//titleSprite->Draw();
+	//titleUISprite->Draw();
+
+
 	// デバッグテキストの描画
-	debugText_->DrawAll(commandList);
+	//debugText_->DrawAll(commandList);
 	//
 	// スプライト描画後処理
 	Sprite::PostDraw();
@@ -273,7 +295,7 @@ void GameScene::CheckAllCollisions()
 #pragma endregion
 
 #pragma region プレイヤーとボス2のビーム
-	if (bossPhase_2->GetBeamFrag()==true)
+	if (bossPhase_2->GetBeamFrag() == true)
 	{
 		WorldTransform BeamTransform = bossPhase_2->GetBeamTransform();
 		Vector3 def = affine::MatVector(BeamTransform.matWorld_, { 0,0,-1 });
@@ -297,17 +319,17 @@ void GameScene::CheckAllCollisions()
 		B = pow((playerR + bulletR), 2);
 
 
-}
-
-
-	
-
-		if (A <= B)
-		{
-			//ボス1の衝突時コールバックを呼び出す
-			player_->OnCollision();
-		}
 	}
+
+
+
+
+	if (A <= B)
+	{
+		//ボス1の衝突時コールバックを呼び出す
+		player_->OnCollision();
+	}
+
 #pragma endregion
 
 #pragma region プレイヤーとボス2の突進
@@ -398,3 +420,4 @@ Vector3 GameScene::Shake(const Vector3& firstPos, int& shakeCount)
 	shakeCount--;
 
 	return pos;
+}
