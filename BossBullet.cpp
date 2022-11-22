@@ -132,6 +132,15 @@ void BossBullet::FlyBlocks(Vector3 playerPos)
 	debugText_->Printf("”ò‚Ô‚â‚Â:%f,%f,%f", worldTransform_.translation_.x, worldTransform_.translation_.y, worldTransform_.translation_.z);*/
 }
 
+void BossBullet::Reset()
+{
+	FloatBlockFlagM = false;
+	FloatBlockFlagP = false;
+	FloatXRimitFlag = false;
+	flyToPlayerFlag = false;
+	ToPlayerFlag_ = false;
+}
+
 void BossBullet::SetToPlayerFlag(bool ToPlayerFlag)
 {
 	ToPlayerFlag_ = ToPlayerFlag;

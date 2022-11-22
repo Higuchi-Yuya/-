@@ -129,8 +129,13 @@ void BossPhase_1::Rset()
 	worldTransform_[0].translation_ = { 0,10,50 };
 	worldTransform_[0].rotation_ = { 0,0,0 };
 
-	bullet->SetPos(worldTransform_[0].translation_);
 
+	worldTransform_[randomBlock].scale_ = { 1.0f,1.0f,1.0f };
+	AnnihilationFlag[randomBlock] = false;
+	randomBlock = 0;
+	bullet->Reset();
+	bullet->SetPos(worldTransform_[0].translation_);
+	
 	// ブロックを浮かし終わるまでのフラグ
 	FloatBlockFlagM = false; // 座標をマイナス
 	FloatBlockFlagP = false; // 座標をプラス

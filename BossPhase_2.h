@@ -135,7 +135,7 @@ private:// ƒƒ“ƒo•Ï”
 
 	Vector3 playerPos_;
 
-	int maxHP = 1;
+	const int maxHP = 1;
 	int HP = maxHP;
 
 	Action isAction= Action::AttackInterval;

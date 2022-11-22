@@ -74,9 +74,6 @@ private:// メンバ変数
 	// 消すときのフラグ
 	bool AnnihilationFlag[27];
 
-	// 弾だったものをもう一度出すフラグ
-	bool RespawnFlag[27];
-
 	// ランダムにとるための変数
 	int randomBlock = 0;
 
@@ -102,7 +99,7 @@ private:// メンバ変数
 	//タイトル挙動用回転角
 	float titleRadian = 0;
 
-	int maxHP = 1;
+	const int maxHP = 1;
 	int HP = maxHP;
 };
 

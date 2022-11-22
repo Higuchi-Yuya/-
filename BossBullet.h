@@ -29,6 +29,9 @@ public:
 	// ブロックを飛ばす処理
 	void FlyBlocks(Vector3 playerPos);
 
+	// リセット
+	void Reset();
+
 	// プレイヤーの位置に行った時のフラグのゲッター
 	bool GetToPlayerFlag() const { return ToPlayerFlag_; }
 

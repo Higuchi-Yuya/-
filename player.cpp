@@ -234,8 +234,6 @@ void player::Rset()
 
 	isDamageInterval = false;
 
-	maxHP = 3;
-	HP = maxHP;
 }
 void player::OnCollision()
 {
