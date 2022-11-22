@@ -198,8 +198,15 @@ void BossPhase_2::Update(Vector3 playerPos)
 
 	TransferMat();
 
-	debugText_->SetPos(10, 130);
-	debugText_->Printf("Attack=%d,%d,%d", Attack,oldAttack,randAttack);
+	/*debugText_->SetPos(10, 130);
+	debugText_->Printf("Attack=%d,%d,%d", Attack,oldAttack,randAttack);*/
+}
+
+void BossPhase_2::TitleUpdate()
+{
+	worldTransform_[0].translation_.x = 100 * cos(angle);
+	worldTransform_[0].translation_.z = 100 * sin(angle);
+	TransferMat();
 }
 
 void BossPhase_2::Draw(ViewProjection viewprojection)
@@ -247,6 +254,101 @@ bool BossPhase_2::GetBoomerangflg(bool UpOrDown)
 		return isUpAttack;
 	}
 	return isDownAttack;
+}
+
+void BossPhase_2::SetIsDead(bool isDead)
+{
+	blowUpFlag = isDead;
+	beamFlag == false;
+	isUpActive == false;
+	isDownActive = false;
+	rushFlag = false;
+}
+
+void BossPhase_2::Rset()
+{
+	// 親
+	worldTransform_[0].translation_ = { 100,20,100 };
+	worldTransform_[0].scale_ = { kyubuScale,kyubuScale,kyubuScale };
+
+	// 子の座標設定
+	// 真ん中の段
+	worldTransform_[1].translation_ = { +kyubuLengh, 0,-kyubuLengh };
+	worldTransform_[2].translation_ = { 0, 0,-kyubuLengh };
+	worldTransform_[3].translation_ = { -kyubuLengh, 0,-kyubuLengh };
+	worldTransform_[4].translation_ = { -kyubuLengh, 0, 0 };
+	worldTransform_[5].translation_ = { -kyubuLengh, 0,+kyubuLengh };
+	worldTransform_[6].translation_ = { 0, 0,+kyubuLengh };
+	worldTransform_[7].translation_ = { +kyubuLengh, 0,+kyubuLengh };
+	worldTransform_[8].translation_ = { +kyubuLengh, 0, 0 };
+
+	// 上の段
+	worldTransform_[9].translation_ = { 0,+kyubuLengh, 0 };
+	worldTransform_[10].translation_ = { 0,+kyubuLengh,-kyubuLengh };
+	worldTransform_[11].translation_ = { -kyubuLengh,+kyubuLengh, 0 };
+	worldTransform_[12].translation_ = { 0,+kyubuLengh,+kyubuLengh };
+	worldTransform_[13].translation_ = { +kyubuLengh,+kyubuLengh, 0 };
+
+	// 下の段
+	worldTransform_[14].translation_ = { 0,-kyubuLengh, 0 };
+	worldTransform_[15].translation_ = { 0,-kyubuLengh,-kyubuLengh };
+	worldTransform_[16].translation_ = { -kyubuLengh,-kyubuLengh, 0 };
+	worldTransform_[17].translation_ = { 0,-kyubuLengh,+kyubuLengh };
+	worldTransform_[18].translation_ = { +kyubuLengh,-kyubuLengh, 0 };
+
+
+	for (int i=0;i<19;i++)
+	{
+		worldTransform_[i].rotation_ = {0,0,0};
+	}
+
+	angle = 1.57;
+
+	HP = maxHP;
+
+	isAction = Action::AttackInterval;
+	intervalFrame = 0;
+	randAttack = 0;
+	Attack = 0;
+	oldAttack = 0;
+
+	blowUpFlag = false;
+	blowUpSetFlag = false;
+	blowmatSetFlag = false;
+	randomAngleX = 0;
+	randomAngleY = 0;
+	randomAngleZ = 0;
+	blowStartAngle = (360 * 6) * affine::Deg2Rad;
+
+	medamawaitTimer = 0;
+	medamaRotaTimer = 0;
+	medamaRotaEndTime = 5 * 60;
+	startMedamaAngle = 0;
+	endMedamaAngle = DegreeToRad(360.0f * 15.0f);
+	medamaDownFlag = false;
+	medamaGraviti = 0.1;
+
+	AnnihilationFlag[0] = false;
+	AnnihilationFlag[1] = false;
+	AnnihilationFlag[2] = false;
+	AnnihilationFlag[3] = false;
+	AnnihilationFlag[4] = false;
+	AnnihilationFlag[5] = false;
+	AnnihilationFlag[6] = false;
+	AnnihilationFlag[7] = false;
+	AnnihilationFlag[8] = false;
+	AnnihilationFlag[9] = false;
+	AnnihilationFlag[10] = false;
+	AnnihilationFlag[11] = false;
+	AnnihilationFlag[12] = false;
+	AnnihilationFlag[13] = false;
+	AnnihilationFlag[14] = false;
+	AnnihilationFlag[15] = false;
+	AnnihilationFlag[16] = false;
+	AnnihilationFlag[17] = false;
+	AnnihilationFlag[18] = false;
+
+	medamaWT.translation_ = { 0.0f,0.0f,-3.2f };
 }
 
 void BossPhase_2::beamUpdate(Vector3 playerPos)
@@ -490,12 +592,12 @@ void BossPhase_2::boomerangUpdate(Vector3 playerPos)
 			downBoomerangWorldTransform[i].TransferMatrix();
 		}
 	}
-	debugText_->SetPos(10, 10);
+	/*debugText_->SetPos(10, 10);
 	debugText_->Printf("Active:%d", isDownActive);
 	debugText_->SetPos(10, 30);
 	debugText_->Printf("Attack:%d", isDownAttack);
 	debugText_->SetPos(10, 50);
-	debugText_->Printf("translation_:%f,%f,%f", downBoomerangWorldTransform[0].translation_.x, downBoomerangWorldTransform[0].translation_.y, upBoomerangWorldTransform[0].translation_.z);
+	debugText_->Printf("translation_:%f,%f,%f", downBoomerangWorldTransform[0].translation_.x, downBoomerangWorldTransform[0].translation_.y, upBoomerangWorldTransform[0].translation_.z);*/
 }
 
 void BossPhase_2::boomerangSet(Vector3 playerPos,bool UpOrDown)
@@ -735,10 +837,10 @@ void BossPhase_2::rushUpdate(Vector3 playerPos)
 				isAction = Action::AttackInterval;
 			}
 		}
-		debugText_->SetPos(20, 140);
+		/*debugText_->SetPos(20, 140);
 		debugText_->Printf("rotaX:%f", worldTransform_[0].rotation_.x);
 		debugText_->SetPos(20, 160);
-		debugText_->Printf("speedX:%f", wheelSpeedX);
+		debugText_->Printf("speedX:%f", wheelSpeedX);*/
 	}
 }
 
@@ -818,8 +920,8 @@ void BossPhase_2::TransferMat()
 			medamaWT.TransferMatrix();
 		}
 	}
-	debugText_->SetPos(20, 200);
-	debugText_->Printf("medama:%f,%f,%f", medamaWT.rotation_.x, medamaWT.rotation_.y, medamaWT.rotation_.z);
+	/*debugText_->SetPos(20, 200);
+	debugText_->Printf("medama:%f,%f,%f", medamaWT.rotation_.x, medamaWT.rotation_.y, medamaWT.rotation_.z);*/
 
 
 	beamWorldTransform_.TransferMatrix();

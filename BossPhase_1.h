@@ -35,6 +35,10 @@ public:// メンバ関数
 
 	WorldTransform GetWorldTransformP() const { return worldTransform_[0]; }
 
+	int GetHP() { return HP; }
+
+	void Rset();
+
 private:// 静的メンバ関数
 
 	// ブロックを飛ばす処理
@@ -50,9 +54,6 @@ private:// 静的メンバ関数
 	void TransferMat();
 
 	void TurnBodyToPlayer(Vector3 playerPos);
-
-
-
 private:// メンバ変数
 
 	//ワールド変換データ
@@ -101,7 +102,7 @@ private:// メンバ変数
 	//タイトル挙動用回転角
 	float titleRadian = 0;
 
-	int maxHP = 10;
+	int maxHP = 1;
 	int HP = maxHP;
 };
 

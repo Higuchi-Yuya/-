@@ -56,6 +56,14 @@ public:
 	const WorldTransform* GetWorldTransform() { return &worldTransform_; }
 
 	void SetEndMoveRotation(Vector3 Transform);
+
+	void AllBulletDelete() { bullets_.clear(); }
+
+	void TransformRset(bool endOrStart);
+
+	void Rset();
+
+	int GetHP() {return HP; }
 private:
 	//ワールド変換データ
 	WorldTransform worldTransform_;

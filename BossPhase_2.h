@@ -31,6 +31,11 @@ public:// メンバ関数
 	// 更新処理
 	void Update(Vector3 playerPos);
 
+	/// <summary>
+/// 第一形態～第二形態へ遷移するようの更新処理
+/// </summary>
+	void TitleUpdate();
+
 	// 描画処理
 	void Draw(ViewProjection viewprojection);
 
@@ -41,7 +46,7 @@ public:// メンバ関数
 
 	bool GetBoomerangflg(bool UpOrDown);
 
-	void SetIsDead(bool isDead) { blowUpFlag = isDead; }
+	void SetIsDead(bool isDead);
 
 	WorldTransform GetPos() { return worldTransform_[0]; }
 
@@ -50,6 +55,12 @@ public:// メンバ関数
 	Vector3 GetDownBoomerangPos() { return downBoomerangWorldTransform->translation_; }
 
 	WorldTransform GetBeamTransform() { return beamWorldTransform_; }
+
+	int GetHP() { return HP; }
+
+	float GetMedamaWTTransformY() { return medamaWT.translation_.y; }
+
+	void Rset();
 
 private:
 	void beamUpdate(Vector3 playerPos);
@@ -124,12 +135,12 @@ private:// メンバ変数
 
 	Vector3 playerPos_;
 
-	int maxHP = 10;
+	int maxHP = 1;
 	int HP = maxHP;
 
 	Action isAction= Action::AttackInterval;
 	const int maxIntervalFrame=200;
-	int intervalFrame;
+	int intervalFrame=0;
 	int randAttack=0;
 	int Attack=0;
 	int oldAttack=0;

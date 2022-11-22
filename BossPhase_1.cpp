@@ -85,8 +85,8 @@ void BossPhase_1::Update(Vector3 playerPos)
 	// 行列の更新と転送
 	TransferMat();
 
-	debugText_->SetPos(10,70);
-	debugText_->Printf("boss1HP%d",HP);
+	/*debugText_->SetPos(10,70);
+	debugText_->Printf("boss1HP%d",HP);*/
 }
 
 void BossPhase_1::TitleUpdate()
@@ -97,7 +97,7 @@ void BossPhase_1::TitleUpdate()
 		titleRadian -= 360.0f;
 	}
 
-	worldTransform_[0].rotation_.y =  MathUtility::PI / 180* titleRadian;
+	worldTransform_[0].rotation_.y = MathUtility::PI / 180 * titleRadian;
 	worldTransform_[0].translation_.y = (sin(MathUtility::PI / 180 * titleRadian) * 2.0f) + 12;
 
 	TransferMat();
@@ -123,6 +123,27 @@ void BossPhase_1::OnCollision()
 	HP--;
 }
 
+void BossPhase_1::Rset()
+{
+	// 親
+	worldTransform_[0].translation_ = { 0,10,50 };
+	worldTransform_[0].rotation_ = { 0,0,0 };
+
+	bullet->SetPos(worldTransform_[0].translation_);
+
+	// ブロックを浮かし終わるまでのフラグ
+	FloatBlockFlagM = false; // 座標をマイナス
+	FloatBlockFlagP = false; // 座標をプラス
+
+	//タイトル挙動用回転角
+	titleRadian = 0;
+
+	HP = maxHP;
+
+	worldTransform_[randomBlock].scale_= {1,1,1};
+	AnnihilationFlag[randomBlock] = false;
+}
+
 void BossPhase_1::FlyBlocks(Vector3 playerPos)
 {
 	// ランダムに抽選を行う
@@ -135,7 +156,7 @@ void BossPhase_1::FlyBlocks(Vector3 playerPos)
 		worldTransform_[randomBlock].scale_ = { 0.0f,0.0f,0.0f };
 	}
 
-	
+
 	// 弾がプレイヤーの位置に行ったら
 	if (bullet->GetToPlayerFlag() == true) {
 		// 徐々に元のものを拡大して再生させる
@@ -158,7 +179,7 @@ void BossPhase_1::FlyBlocks(Vector3 playerPos)
 	if (worldTransform_[randomBlock].scale_.x >= 1.0f) {
 		ResetFlyBlocks();
 	}
-	
+
 
 }
 
@@ -169,12 +190,12 @@ void BossPhase_1::FloatRandomBlocks()
 		randomBlock = rand() % 26 + 1;
 		oldPos = worldTransform_[randomBlock].translation_;
 		// 弾の登録
-		bullet->Initialize(model_, worldTransform_[randomBlock], worldTransform_[0].translation_,rotaAngle);
+		bullet->Initialize(model_, worldTransform_[randomBlock], worldTransform_[0].translation_, rotaAngle);
 	}
 
 	// 再抽選が終わったら
 	if (worldTransform_[randomBlock].translation_.x > worldTransform_[0].translation_.x ||
-		worldTransform_[randomBlock].translation_.x < worldTransform_[0].translation_.x) 
+		worldTransform_[randomBlock].translation_.x < worldTransform_[0].translation_.x)
 	{
 		AnnihilationFlag[randomBlock] = true;
 	}
@@ -221,4 +242,4 @@ void BossPhase_1::TurnBodyToPlayer(Vector3 playerPos)
 	// X軸周り角度(θx)
 	worldTransform_[0].rotation_.x = std::atan2(-velosityZ.y, velosityZ.z);
 }
-	
+

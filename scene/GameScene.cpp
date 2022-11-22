@@ -48,7 +48,8 @@ void GameScene::Initialize() {
 	sky_->Initialize();
 	player_->Initialize();
 	railCamera_->Initialize(Vector3(0, 5, -50), Vector3(0, 0, 0), player_->GetWorldTransform());
-	viewProjection = &railCamera_->GetViewProjection();
+	railCamera_->Update();
+	viewProjection = &titleCamera;
 
 	//カメラ初期座標の初期化
 	cameraPos[Title] = bossPhase_1->GetWorldTransformP().translation_;
@@ -95,23 +96,161 @@ void GameScene::Update() {
 		viewProjection = &titleCamera;
 	}
 
-	player_->Update();
-	railCamera_->Update();
-	cameraPos[GameStart] = railCamera_->GetViewProjection().eye;
+	switch (gameLoop)
+	{
+	case GameLoop::Title:
+		bossPhase_1->TitleUpdate();
+		if (input_->TriggerKey(DIK_P))
+		{
+			gameLoop = GameLoop::Game;
+			player_->TransformRset(false);
+			railCamera_->Update();
+		}
+		break;
+	case GameLoop::Game:
+		switch (bossTrans)
+		{
+		case BossTrans::TitleToGame:
+			bossPhase_1->TitleUpdate();
+			AnimationCameraUpdate();
+			if (animeTimer >= 1)
+			{
+				viewProjection = &railCamera_->GetViewProjection();
+				bossTrans = BossTrans::Boss1;
+				railCamera_->Update();
+			}
+			break;
+		case BossTrans::Boss1:
+			bossPhase_1->Update(player_->GetworldPosition());
+			player_->Update();
+			railCamera_->Update();
+			if (bossPhase_1->GetHP()<=0)
+			{
+				player_->TransformRset(false);
+				railCamera_->Update();
+				player_->AllBulletDelete();
+				animeTimer = 0;
+				animetionPhase = Phase::Boss1To2;
+				cameraShakeCount = 49;
+				viewProjection = &titleCamera;
+				bossTrans = BossTrans::Boss1To2;
+			}
+			if (player_->GetHP()<=0)
+			{
+				player_->AllBulletDelete();
+				gameLoop = GameLoop::GameOver;
+			}
+			break;
+		case BossTrans::Boss1To2:
+			//// ボスフェーズ1の描画
+			if (animeTimer < 50)
+			{
+				bossPhase_1->TitleUpdate();
+			}
+			else
+			{
+				bossPhase_2->TitleUpdate();
+			}
+			AnimationCameraUpdate();
+			if (animeTimer - 52 >= 0)
+			{
+				viewProjection = &railCamera_->GetViewProjection();
+				bossTrans = BossTrans::Boss2;
+			}
+			break;
+		case BossTrans::Boss2:
+			player_->Update();
+			bossPhase_2->Update(player_->GetworldPosition());
+			railCamera_->Update();
+			if (bossPhase_2->GetHP() <= 0)
+			{
+				player_->TransformRset(false);
+				player_->AllBulletDelete();
+				animeTimer = 0;
+				animetionPhase = Phase::GameToResult;
+				player_->SetEndMoveRotation(bossPhase_2->GetPos().translation_);
+				player_->Update();
 
-	AnimationCameraUpdate();
+				//ボスを死亡
+				bossPhase_2->SetIsDead(true);
+				boss2Mat = bossPhase_2->GetPos().matWorld_;
+				viewProjection = &titleCamera;
+				bossTrans = BossTrans::GameToResult;
+			}
+			if (player_->GetHP() <= 0)
+			{
+				player_->AllBulletDelete();
+				gameLoop = GameLoop::GameOver;
+			}
+			break;
+		case BossTrans::GameToResult:
+			AnimationCameraUpdate();
+			bossPhase_2->Update(player_->GetworldPosition());
+			if (bossPhase_2->GetMedamaWTTransformY()<=-10)
+			{
 
-	// ボスのフェーズ1の更新
-	bossPhase_1->TitleUpdate();
-	//bossPhase_1->Update(player_->GetworldPosition());
+				gameLoop = GameLoop::Result;
+			}
+			break;
+		}
+		break;
+	case GameLoop::GameOver:
+		if (bossTrans==BossTrans::Boss1)
+		{
+			bossPhase_1->Update(player_->GetworldPosition());
+		}
+		else
+		{
+			bossPhase_2->Update(player_->GetworldPosition());
+		}
+		if (input_->TriggerKey(DIK_P))
+		{
+			animeTimer = 0;
+			animetionPhase = TitleToGame;
+			player_->Rset();
+			bossPhase_2->Rset();
+			bossPhase_1->Rset();
+			gameLoop = GameLoop::Title;
+			bossTrans = BossTrans::TitleToGame;
+			viewProjection = &titleCamera;
+			titleCamera.eye = cameraPos[Title];
+			titleCamera.target = Vector3(cameraPos[Title].x, cameraPos[Title].y, cameraPos[Title].z + 50);
+			titleCamera.UpdateMatrix();
+
+		}
+		break;
+	case GameLoop::Result:
+		if (input_->TriggerKey(DIK_P))
+		{
+			animeTimer = 0;
+			animetionPhase = TitleToGame;
+			player_->Rset();
+			bossPhase_2->Rset();
+			bossPhase_1->Rset();
+			gameLoop = GameLoop::Title;
+			bossTrans = BossTrans::TitleToGame;
+			titleCamera.eye = cameraPos[Title];
+			titleCamera.target = Vector3(cameraPos[Title].x, cameraPos[Title].y, cameraPos[Title].z + 50);
+			titleCamera.UpdateMatrix();
+		}
+		break;
+	}
+	/*cameraPos[GameStart] = railCamera_->GetViewProjection().eye;*/
 
 	// ボスのフェーズ2の更新
-	bossPhase_2->Update(player_->GetworldPosition());
-
-	// ボスのフェーズ3の更新
-	bossPhase_3->Update();
+	//bossPhase_2->Update(player_->GetworldPosition());
 
 	CheckAllCollisions();
+	debugText_->SetPos(10,10);
+	debugText_->Printf("boss1:%d",bossPhase_1->GetHP());
+	debugText_->SetPos(10, 30);
+	debugText_->Printf("boss2:%d", bossPhase_2->GetHP());
+	debugText_->SetPos(10, 50);
+	debugText_->Printf("player:%d", player_->GetHP());
+	debugText_->SetPos(10, 70);
+	debugText_->Printf("%d", gameLoop);
+	debugText_->SetPos(10, 90);
+	debugText_->Printf("%d", bossTrans);
 }
 
 void GameScene::Draw() {
@@ -141,17 +280,57 @@ void GameScene::Draw() {
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	model_->Draw(worldTransform, *viewProjection);
 	player_->Draw(*viewProjection);
+	switch (gameLoop)
+	{
+	case GameLoop::Title:
+		//// ボスフェーズ1の描画
+		bossPhase_1->Draw(*viewProjection);
 
-	//// ボスフェーズ1の描画
-	bossPhase_1->Draw(*viewProjection);
-
-	// ボスフェーズ2の描画
-	//if (animetionPhase >= Phase::Boss1To2) {
-	bossPhase_2->Draw(*viewProjection);
-	//}
-
-	//// ボスフェーズ3の描画
-	//bossPhase_3->Draw(railCamera_->GetViewProjection());
+		break;
+	case GameLoop::Game:
+		switch (bossTrans)
+		{
+		case BossTrans::TitleToGame:
+			//// ボスフェーズ1の描画
+			bossPhase_1->Draw(*viewProjection);
+			break;
+		case BossTrans::Boss1:
+			//// ボスフェーズ1の描画
+			bossPhase_1->Draw(*viewProjection);
+			break;
+		case BossTrans::Boss1To2:
+			//// ボスフェーズ1の描画
+			if (animeTimer < 50)
+			{
+				bossPhase_1->Draw(*viewProjection);
+			}
+			if (animeTimer >= 50)
+			{
+				bossPhase_2->Draw(*viewProjection);
+			}
+			break;
+		case BossTrans::Boss2:
+			bossPhase_2->Draw(*viewProjection);
+			break;
+		case BossTrans::GameToResult:
+			bossPhase_2->Draw(*viewProjection);
+			break;
+		}
+		break;
+	case GameLoop::GameOver:
+		//// ボスフェーズ1の描画
+		if (bossTrans== BossTrans::Boss1)
+		{
+			bossPhase_1->Draw(*viewProjection);
+		}
+		else
+		{
+			bossPhase_2->Draw(*viewProjection);
+		}
+		break;
+	case GameLoop::Result:
+		break;
+	}
 
 	sky_->Draw(*viewProjection);
 	/// </summary>
@@ -167,9 +346,34 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに前景スプライトの描画処理を追加できる
 	/// </summary>
-
-	//titleSprite->Draw();
-	//titleUISprite->Draw();
+	switch (gameLoop)
+	{
+	case GameLoop::Title:
+		titleSprite->Draw();
+		titleUISprite->Draw();
+		break;
+	case GameLoop::Game:
+		switch (bossTrans)
+		{
+		case BossTrans::TitleToGame:
+			break;
+		case BossTrans::Boss1:
+			break;
+		case BossTrans::Boss1To2:
+			break;
+		case BossTrans::Boss2:
+			break;
+		case BossTrans::GameToResult:
+			break;
+		default:
+			break;
+		}
+		break;
+	case GameLoop::GameOver:
+		break;
+	case GameLoop::Result:
+		break;
+	}
 
 
 	// デバッグテキストの描画
@@ -473,12 +677,12 @@ void GameScene::AnimationCameraUpdate()
 
 	titleCamera.UpdateMatrix();
 
-	debugText_->SetPos(50, 150);
+	/*debugText_->SetPos(50, 150);
 	debugText_->Printf("bossPosition:%1.4f,%1.4f,%1.4f", bossPhase_2->GetPos().translation_.x, bossPhase_2->GetPos().translation_.y, bossPhase_2->GetPos().translation_.z);
 	debugText_->SetPos(50, 170);
 	debugText_->Printf("cameraTarget:%1.4f,%1.4f,%1.4f", titleCamera.target.x, titleCamera.target.y, titleCamera.target.z);
 	debugText_->SetPos(50, 185);
-	debugText_->Printf("animeTimer:%1.5f", animeTimer);
+	debugText_->Printf("animeTimer:%1.5f", animeTimer);*/
 }
 
 Vector3 GameScene::Shake(const Vector3& firstPos, int& shakeCount)

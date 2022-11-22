@@ -36,6 +36,22 @@ enum Phase {
 	PhaseIndex,//フェーズの総数
 };
 
+enum class GameLoop
+{
+	Title,
+	Game,
+	GameOver,
+	Result,
+};
+enum class BossTrans
+{
+	TitleToGame,//タイトルからゲームへ
+	Boss1,
+	Boss1To2,//ボス１から２
+	Boss2,
+	GameToResult,//ゲームからリザルト(クリア)
+};
+
 /// <summary>
 /// ゲームシーン
 /// </summary>
@@ -118,6 +134,11 @@ class GameScene {
 	Sprite* titleUISprite = nullptr;
 
 	ViewProjection *viewProjection=nullptr;
+
+
+	GameLoop gameLoop=GameLoop::Title;
+	BossTrans bossTrans = BossTrans::TitleToGame;
+
 	/// <summary>
 	/// ゲームシーン用
 	/// </summary>

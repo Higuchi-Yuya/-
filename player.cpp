@@ -28,10 +28,10 @@ void player::Update() {
 		return bullet->IsDead();
 		});
 
-	if (isDamageInterval==true)
+	if (isDamageInterval == true)
 	{
 		damageInterval--;
-		if (damageInterval<=0)
+		if (damageInterval <= 0)
 		{
 			isDamageInterval = false;
 		}
@@ -45,13 +45,6 @@ void player::Update() {
 
 	Vector3 move = { 0,0,0 };
 	Vector3 rot = { 0,0,0 };
-	//ゲームパッドの状態を得る変数（XINPUT）
-	XINPUT_STATE joyState;
-	//ジョイスティック状態取得
-	if (Input::GetInstance()->GetJoystickState(0, joyState)) {
-		move.x += (float)joyState.Gamepad.sThumbLX / SHRT_MAX * 0.1;
-		move.y += (float)joyState.Gamepad.sThumbLY / SHRT_MAX * 0.1;
-	}
 	////プレイヤー移動処理
 	if (input_->PushKey(DIK_A))
 	{
@@ -93,8 +86,8 @@ void player::Update() {
 	float AR;
 	float BR;
 
-	AR = pow(( worldTransform_.translation_.x+move.x)-0, 2) + pow((0 +worldTransform_.translation_.z+move.z), 2);
-	BR = pow((50 - worldTransform_.scale_.x*2), 2);
+	AR = pow((worldTransform_.translation_.x + move.x) - 0, 2) + pow((0 + worldTransform_.translation_.z + move.z), 2);
+	BR = pow((50 - worldTransform_.scale_.x * 2), 2);
 
 	if (AR <= BR)
 	{
@@ -102,7 +95,7 @@ void player::Update() {
 	}
 
 	/*worldTransform_.translation_ += move;*/
-	worldTransform_.rotation_.y += rot.y *affine::Deg2Rad;
+	worldTransform_.rotation_.y += rot.y * affine::Deg2Rad;
 	worldTransform_.rotation_.x += rot.x * affine::Deg2Rad;
 	//移動限界座標
 	const float kRotLimit = 30.0 * affine::Deg2Rad;
@@ -134,8 +127,8 @@ void player::Update() {
 	debugText_->SetPos(10, 30);
 	debugText_->Printf("%f,%f,%f", worldTransform_.translation_.x, worldTransform_.translation_.y,worldTransform_.translation_.z);*/
 
-	debugText_->SetPos(10, 110);
-	debugText_->Printf("playerHP%d", HP);
+	//debugText_->SetPos(10, 110);
+	//debugText_->Printf("playerHP%d", HP);
 }
 
 void player::Attack() {
@@ -158,7 +151,7 @@ void player::Attack() {
 
 		//弾の生成し、初期化
 		std::unique_ptr<playerBullet> newBullet = std::make_unique<playerBullet>();
-		newBullet->Initialize(worldTransform_.translation_,worldTransform_.rotation_, velocity);
+		newBullet->Initialize(worldTransform_.translation_, worldTransform_.rotation_, velocity);
 
 		//弾の登録する
 		bullets_.push_back(std::move(newBullet));
@@ -166,15 +159,18 @@ void player::Attack() {
 }
 
 void player::Draw(ViewProjection& viewProjection_) {
-	if (isDamageInterval==false)
+	if (HP>0)
 	{
-		model_->Draw(worldTransform_, viewProjection_);
-	}
-	else
-	{
-		if (damageInterval%3==0)
+		if (isDamageInterval == false)
 		{
 			model_->Draw(worldTransform_, viewProjection_);
+		}
+		else
+		{
+			if (damageInterval % 3 == 0)
+			{
+				model_->Draw(worldTransform_, viewProjection_);
+			}
 		}
 	}
 
@@ -199,15 +195,51 @@ Vector3 player::GetworldPosition()
 }
 void player::SetEndMoveRotation(Vector3 Transform)
 {
+	worldTransform_.translation_ = {0,0,0};
 	// 打つ方向に向けてオブジェクトを回転させる
 	Vector3 velocity = Transform - worldTransform_.translation_;
 	velocity.normalize();
 	// Y軸周り角度(θy)
 	worldTransform_.rotation_.y = std::atan2(velocity.x, velocity.z);
 }
+void player::TransformRset(bool endOrStart)
+{
+	if (endOrStart == false)
+	{
+		worldTransform_.translation_ = { 0,0,0 };
+		worldTransform_.rotation_ = { 0,0,0 };
+		jumpFlag = 0;
+		defGravitySpeed = gravitySpeed;
+		affine::makeAffine(worldTransform_);
+		worldTransform_.TransferMatrix();
+	}
+	else
+	{
+		jumpFlag = 0;
+		defGravitySpeed = gravitySpeed;
+		worldTransform_.translation_.y =0;
+		affine::makeAffine(worldTransform_);
+		worldTransform_.TransferMatrix();
+	}
+}
+void player::Rset()
+{
+	HP = maxHP;
+
+	TransformRset(false);
+
+	jumpFlag = 0u;
+
+	defGravitySpeed = gravitySpeed;
+
+	isDamageInterval = false;
+
+	maxHP = 3;
+	HP = maxHP;
+}
 void player::OnCollision()
 {
-	if (isDamageInterval==false)
+	if (isDamageInterval == false)
 	{
 		HP--;
 		isDamageInterval = true;
@@ -223,7 +255,7 @@ void player::jump()
 
 		if (gravitySpeed <= 0)
 		{
- 			jumpFlag = 2;
+			jumpFlag = 2;
 		}
 	}
 
