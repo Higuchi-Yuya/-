@@ -132,6 +132,10 @@ class GameScene {
 	uint32_t titleUITexture = 0;
 	Sprite* titleSprite = nullptr;
 	Sprite* titleUISprite = nullptr;
+	Sprite* playGuideSprite=nullptr;
+	Sprite* resultUISprite = nullptr;
+	Sprite* resultSprite = nullptr;
+	Sprite* GameOverSprite = nullptr;
 
 	ViewProjection *viewProjection=nullptr;
 

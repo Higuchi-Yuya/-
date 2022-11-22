@@ -14,6 +14,16 @@ void BossPhase_1::Initialize()
 		// フラグ
 		AnnihilationFlag[i] = false;
 	}
+	int texHP = TextureManager::Load("bossBarNaka.png");
+	int texHPBar = TextureManager::Load("bossBar.png");
+
+	spriteHP = Sprite::Create(texHP, { 330.0f,610.0f }, { 1,1,1,1 }, { 0,0 });
+
+	spriteHP->SetSize({ 620,50 });
+
+	spriteHPBar = Sprite::Create(texHPBar, { 320,600 }, { 1,1,1,1 }, { 0,0 });
+
+	spriteHPBar->SetSize({ 640,50 });
 
 	// 親
 	worldTransform_[0].translation_ = { 0,10,50 };
@@ -85,6 +95,8 @@ void BossPhase_1::Update(Vector3 playerPos)
 	// 行列の更新と転送
 	TransferMat();
 
+	spriteHP->SetSize({ float((620 / maxHP)*HP), 25 });
+
 	/*debugText_->SetPos(10,70);
 	debugText_->Printf("boss1HP%d",HP);*/
 }
@@ -118,6 +130,12 @@ void BossPhase_1::Draw(ViewProjection viewprojection)
 	}
 }
 
+void BossPhase_1::DrawUI()
+{
+	spriteHP->Draw();
+	spriteHPBar->Draw();
+}
+
 void BossPhase_1::OnCollision()
 {
 	HP--;
@@ -135,7 +153,7 @@ void BossPhase_1::Rset()
 	randomBlock = 0;
 	bullet->Reset();
 	bullet->SetPos(worldTransform_[0].translation_);
-	
+
 	// ブロックを浮かし終わるまでのフラグ
 	FloatBlockFlagM = false; // 座標をマイナス
 	FloatBlockFlagP = false; // 座標をプラス
@@ -145,7 +163,7 @@ void BossPhase_1::Rset()
 
 	HP = maxHP;
 
-	worldTransform_[randomBlock].scale_= {1,1,1};
+	worldTransform_[randomBlock].scale_ = { 1,1,1 };
 	AnnihilationFlag[randomBlock] = false;
 }
 

@@ -92,11 +92,13 @@ private:
 	const float defGravitySpeed = 1.5;
 	float gravitySpeed = defGravitySpeed;
 
-	const int maxHP = 1;
+	const int maxHP = 3;
 	int HP = maxHP;
 
 	bool isDamageInterval;
 
 	int damageInterval;
+
+	Sprite* spriteHP[3];
 };
 

@@ -7,18 +7,23 @@ void player::Initialize() {
 
 	model_ = Model::CreateFromOBJ("player");
 
+	uint32_t texHP = TextureManager::Load("heart.png");
+
+	for (int i = 0; i < maxHP; i++)
+	{
+		spriteHP[i] = Sprite::Create(texHP, { 10,10 }, { 1,1,1,1 }, { 0,0 });
+
+		spriteHP[i]->SetSize({ 41.6,34.1 });
+
+		spriteHP[i]->SetPosition({ 30 + spriteHP[i]->GetSize().x * i + i * 10,30 });
+	}
+
 	worldTransform_.Initialize();
 	worldTransform_.translation_ = Vector3(0.0f, 0.0f, 0.0f);
 	textureHandle_ = TextureManager::Load("uvChecker.png");
 
 	//3Dレティクルのワールドトランスフォームの初期化
 	worldTransform3DReticle_.Initialize();
-
-	//レティクル用テクスチャ取得
-	uint32_t textureReticle = TextureManager::Load("2D.png");
-
-	//スプライト生成
-	sprite2DReticle_.reset(Sprite::Create(textureReticle, Vector2{ 640,360 }, Vector4{ 1,1,1,1 }, Vector2(0.5, 0.5)));
 }
 
 void player::Update() {
@@ -113,22 +118,24 @@ void player::Attack() {
 	}*/
 	XINPUT_STATE gamePad;
 	XINPUT_STATE oldGamePad;
-	input_->GetInstance()->GetJoystickState(0, gamePad);
 	input_->GetInstance()->GetJoystickStatePrevious(0, oldGamePad);
-	if (gamePad.Gamepad.bRightTrigger >= 200 && oldGamePad.Gamepad.bRightTrigger < 200) {
+	input_->GetInstance()->GetJoystickState(0, gamePad);
+	int A = (gamePad.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER);
+	int B = (oldGamePad.Gamepad.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER);
+	if (A == 512 && B == 0) {
 		//弾の速度
 		const float kBulletSpeed = 1.0f;
-		Vector3 velocity(0, 0, kBulletSpeed);
-		velocity = affine::MatVector(worldTransform_.matWorld_, velocity);
-		float len = sqrt(velocity.x * velocity.x + velocity.y * velocity.y + velocity.z * velocity.z);
-		if (len != 0)
-		{
-			velocity /= len;
-		}
+			Vector3 velocity(0, 0, kBulletSpeed);
+			velocity = affine::MatVector(worldTransform_.matWorld_, velocity);
+			float len = sqrt(velocity.x * velocity.x + velocity.y * velocity.y + velocity.z * velocity.z);
+			if (len != 0)
+			{
+				velocity /= len;
+			}
 		velocity *= kBulletSpeed;
 
-		//弾の生成し、初期化
-		std::unique_ptr<playerBullet> newBullet = std::make_unique<playerBullet>();
+			//弾の生成し、初期化
+			std::unique_ptr<playerBullet> newBullet = std::make_unique<playerBullet>();
 		newBullet->Initialize(worldTransform_.translation_, worldTransform_.rotation_, velocity);
 
 		//弾の登録する
@@ -159,7 +166,10 @@ void player::Draw(ViewProjection& viewProjection_) {
 	}
 }
 void player::DrawUI() {
-	sprite2DReticle_->Draw();
+	for (int i = 0; i < HP; i++)
+	{
+		spriteHP[i]->Draw();
+	}
 }
 Vector3 player::GetworldPosition()
 {

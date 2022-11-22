@@ -13,6 +13,17 @@ void BossPhase_2::Initialize()
 	beamModel_ = Model::CreateFromOBJ("beam");
 	medamaModel_ = Model::CreateFromOBJ("Medama");
 
+	int texHP = TextureManager::Load("bossBarNaka.png");
+	int texHPBar = TextureManager::Load("bossBar.png");
+
+	spriteHP = Sprite::Create(texHP, { 330.0f,610.0f }, { 1,1,1,1 }, { 0,0 });
+
+	spriteHP->SetSize({ 620,50 });
+
+	spriteHPBar = Sprite::Create(texHPBar, { 320,600 }, { 1,1,1,1 }, { 0,0 });
+
+	spriteHPBar->SetSize({ 640,50 });
+
 	for (int i = 0; i < 19; i++) {
 
 		worldTransform_[i].Initialize();
@@ -198,6 +209,8 @@ void BossPhase_2::Update(Vector3 playerPos)
 
 	TransferMat();
 
+	spriteHP->SetSize({ float((620 / maxHP) * HP), 25 });
+
 	/*debugText_->SetPos(10, 130);
 	debugText_->Printf("Attack=%d,%d,%d", Attack,oldAttack,randAttack);*/
 }
@@ -240,6 +253,12 @@ void BossPhase_2::Draw(ViewProjection viewprojection)
 	}
 
 	medamaModel_->Draw(medamaWT, viewprojection);
+}
+
+void BossPhase_2::DrawUI()
+{
+	spriteHP->Draw();
+	spriteHPBar->Draw();
 }
 
 void BossPhase_2::OnCollision()

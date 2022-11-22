@@ -39,6 +39,8 @@ public:// メンバ関数
 	// 描画処理
 	void Draw(ViewProjection viewprojection);
 
+	void DrawUI();
+
 	//衝突を検出したら呼び出されたるコールバック関数
 	void OnCollision();
 
@@ -135,8 +137,10 @@ private:// メンバ変数
 
 	Vector3 playerPos_;
 
-	const int maxHP = 1;
+	const int maxHP = 10;
 	int HP = maxHP;
+	Sprite* spriteHP;
+	Sprite* spriteHPBar;
 
 	Action isAction= Action::AttackInterval;
 	const int maxIntervalFrame=200;

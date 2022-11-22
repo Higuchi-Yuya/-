@@ -26,6 +26,9 @@ public:// メンバ関数
 	// 描画処理
 	void Draw(ViewProjection viewprojection);
 
+	// 描画処理
+	void DrawUI();
+
 	WorldTransform GetPos() { return worldTransform_[0]; }
 
 	//衝突を検出したら呼び出されたるコールバック関数
@@ -99,7 +102,10 @@ private:// メンバ変数
 	//タイトル挙動用回転角
 	float titleRadian = 0;
 
-	const int maxHP = 1;
+	const int maxHP = 10;
 	int HP = maxHP;
+
+	Sprite* spriteHP;
+	Sprite* spriteHPBar;
 };
 

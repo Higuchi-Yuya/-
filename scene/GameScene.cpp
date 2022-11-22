@@ -72,17 +72,27 @@ void GameScene::Initialize() {
 	//タイトル用テクスチャ読み込み
 	titleTexture = TextureManager::Load("Title.png");
 	titleUITexture = TextureManager::Load("PressAStart.png");
+	int texturePlayGuido = TextureManager::Load("Sousa.png");
+	int texturerRisultUI = TextureManager::Load("PressATitle.png");
+	int gameOverTexture = TextureManager::Load("GameOver.png");
+	int resultTexture = TextureManager::Load("GameCLEAR.png");
 
 	//スプライト生成
 	titleSprite = Sprite::Create(titleTexture, { WinApp::kWindowWidth / 2,256 });
 	titleUISprite = Sprite::Create(titleUITexture, { WinApp::kWindowWidth / 2,WinApp::kWindowHeight - 64 });
+	playGuideSprite = Sprite::Create(texturePlayGuido,{30,490},{1,1,1,1},{0,0});
+	resultUISprite = Sprite::Create(texturerRisultUI,{ WinApp::kWindowWidth / 2,WinApp::kWindowHeight - 64 },{1,1,1,1},{0.5,1});
+	GameOverSprite = Sprite::Create(gameOverTexture,{ WinApp::kWindowWidth / 2,180 },{1,1,1,1}, Vector2(0.5f, 0.3f));
+	resultSprite = Sprite::Create(resultTexture, { WinApp::kWindowWidth / 2,180 }, { 1,1,1,1 }, Vector2(0.5f, 0.3f));
 
 	titleSprite->SetAnchorPoint(Vector2(0.5f, 0.3f));
 	titleUISprite->SetAnchorPoint(Vector2(0.5f, 1));
 	titleUISprite->SetSize(Vector2(784 * 3 / 10, 288 * 3 / 10));
 	titleSprite->SetSize(Vector2(688 * 9 / 10, 336 * 9 / 10));
-
-
+	playGuideSprite->SetSize({212,212});
+	resultUISprite->SetSize(Vector2(784 * 3 / 10, 288 * 3 / 10));
+	GameOverSprite->SetSize(Vector2(688 * 9 / 10, 336 * 9 / 10));
+	resultSprite->SetSize(Vector2(688 * 9 / 10, 336 * 9 / 10));
 }
 
 void GameScene::Update() {
@@ -247,7 +257,7 @@ void GameScene::Update() {
 	//bossPhase_2->Update(player_->GetworldPosition());
 
 	CheckAllCollisions();
-	debugText_->SetPos(10, 10);
+	/*debugText_->SetPos(10, 10);
 	debugText_->Printf("boss1:%d", bossPhase_1->GetHP());
 	debugText_->SetPos(10, 30);
 	debugText_->Printf("boss2:%d", bossPhase_2->GetHP());
@@ -256,7 +266,7 @@ void GameScene::Update() {
 	debugText_->SetPos(10, 70);
 	debugText_->Printf("%d",A);
 	debugText_->SetPos(10, 90);
-	debugText_->Printf("%d",oldA);
+	debugText_->Printf("%d",oldA);*/
 }
 
 void GameScene::Draw() {
@@ -364,10 +374,16 @@ void GameScene::Draw() {
 		case BossTrans::TitleToGame:
 			break;
 		case BossTrans::Boss1:
+			playGuideSprite->Draw();
+			bossPhase_1->DrawUI();
+			player_->DrawUI();
 			break;
 		case BossTrans::Boss1To2:
 			break;
 		case BossTrans::Boss2:
+			playGuideSprite->Draw();
+			bossPhase_2->DrawUI();
+			player_->DrawUI();
 			break;
 		case BossTrans::GameToResult:
 			break;
@@ -376,8 +392,12 @@ void GameScene::Draw() {
 		}
 		break;
 	case GameLoop::GameOver:
+		GameOverSprite->Draw();
+		resultUISprite->Draw();
 		break;
 	case GameLoop::Result:
+		resultSprite->Draw();
+		resultUISprite->Draw();
 		break;
 	}
 
