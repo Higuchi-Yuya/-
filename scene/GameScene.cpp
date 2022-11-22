@@ -89,22 +89,28 @@ void GameScene::Update() {
 
 	if (input_->TriggerKey(DIK_0))
 	{
-		viewProjection=&railCamera_->GetViewProjection();
+		viewProjection = &railCamera_->GetViewProjection();
 	}
 	if (input_->TriggerKey(DIK_5))
 	{
 		viewProjection = &titleCamera;
 	}
 
+	XINPUT_STATE gamePad;
+	XINPUT_STATE oldGamePad;
+	input_->GetInstance()->GetJoystickStatePrevious(0, oldGamePad);
+	input_->GetInstance()->GetJoystickState(0, gamePad);
+	int A = (gamePad.Gamepad.wButtons & XINPUT_GAMEPAD_A);
+	int oldA = (oldGamePad.Gamepad.wButtons & XINPUT_GAMEPAD_A);
 	switch (gameLoop)
 	{
 	case GameLoop::Title:
 		bossPhase_1->TitleUpdate();
-		if (input_->TriggerKey(DIK_P))
+		if (A == 4096 &&oldA== 0)
 		{
 			gameLoop = GameLoop::Game;
-			player_->TransformRset(false);
-			railCamera_->Update();
+				player_->TransformRset(false);
+				railCamera_->Update();
 		}
 		break;
 	case GameLoop::Game:
@@ -124,7 +130,7 @@ void GameScene::Update() {
 			bossPhase_1->Update(player_->GetworldPosition());
 			player_->Update();
 			railCamera_->Update();
-			if (bossPhase_1->GetHP()<=0)
+			if (bossPhase_1->GetHP() <= 0)
 			{
 				player_->TransformRset(false);
 				railCamera_->Update();
@@ -135,7 +141,7 @@ void GameScene::Update() {
 				viewProjection = &titleCamera;
 				bossTrans = BossTrans::Boss1To2;
 			}
-			if (player_->GetHP()<=0)
+			if (player_->GetHP() <= 0)
 			{
 				player_->AllBulletDelete();
 				gameLoop = GameLoop::GameOver;
@@ -186,7 +192,7 @@ void GameScene::Update() {
 		case BossTrans::GameToResult:
 			AnimationCameraUpdate();
 			bossPhase_2->Update(player_->GetworldPosition());
-			if (bossPhase_2->GetMedamaWTTransformY()<=-10)
+			if (bossPhase_2->GetMedamaWTTransformY() <= -10)
 			{
 
 				gameLoop = GameLoop::Result;
@@ -195,7 +201,7 @@ void GameScene::Update() {
 		}
 		break;
 	case GameLoop::GameOver:
-		if (bossTrans==BossTrans::Boss1)
+		if (bossTrans == BossTrans::Boss1)
 		{
 			bossPhase_1->Update(player_->GetworldPosition());
 		}
@@ -203,7 +209,7 @@ void GameScene::Update() {
 		{
 			bossPhase_2->Update(player_->GetworldPosition());
 		}
-		if (input_->TriggerKey(DIK_P))
+		if (A == 4096 && oldA == 0)
 		{
 			animeTimer = 0;
 			animetionPhase = TitleToGame;
@@ -220,7 +226,7 @@ void GameScene::Update() {
 		}
 		break;
 	case GameLoop::Result:
-		if (input_->TriggerKey(DIK_P))
+		if (A == 4096 && oldA == 0)
 		{
 			animeTimer = 0;
 			animetionPhase = TitleToGame;
@@ -241,16 +247,16 @@ void GameScene::Update() {
 	//bossPhase_2->Update(player_->GetworldPosition());
 
 	CheckAllCollisions();
-	debugText_->SetPos(10,10);
-	debugText_->Printf("boss1:%d",bossPhase_1->GetHP());
+	debugText_->SetPos(10, 10);
+	debugText_->Printf("boss1:%d", bossPhase_1->GetHP());
 	debugText_->SetPos(10, 30);
 	debugText_->Printf("boss2:%d", bossPhase_2->GetHP());
 	debugText_->SetPos(10, 50);
 	debugText_->Printf("player:%d", player_->GetHP());
 	debugText_->SetPos(10, 70);
-	debugText_->Printf("%d", gameLoop);
+	debugText_->Printf("%d",A);
 	debugText_->SetPos(10, 90);
-	debugText_->Printf("%d", bossTrans);
+	debugText_->Printf("%d",oldA);
 }
 
 void GameScene::Draw() {
@@ -319,7 +325,7 @@ void GameScene::Draw() {
 		break;
 	case GameLoop::GameOver:
 		//// ボスフェーズ1の描画
-		if (bossTrans== BossTrans::Boss1)
+		if (bossTrans == BossTrans::Boss1)
 		{
 			bossPhase_1->Draw(*viewProjection);
 		}
@@ -466,7 +472,7 @@ void GameScene::CheckAllCollisions()
 
 		if (calcRaySphere({ BeamTransform.matWorld_.m[3][0], BeamTransform.matWorld_.m[3][1] , BeamTransform.matWorld_.m[3][2] }, def, playerPos, playerR))
 		{
-			if (BeamTransform.scale_.z>40)
+			if (BeamTransform.scale_.z > 40)
 			{
 				//ボス1の衝突時コールバックを呼び出す
 				player_->OnCollision();
@@ -625,7 +631,7 @@ void GameScene::AnimationCameraUpdate()
 	else if (animetionPhase == Phase::GameToResult) {
 		//プレイヤーを敵に向かせる
 		float playerRota = bossPhase_2->GetPos().rotation_.y + 180.0f;
-		
+
 		//プレイヤーのY軸回転を設定する
 		//player_->
 
@@ -650,12 +656,12 @@ void GameScene::AnimationCameraUpdate()
 			//1つめの座標はいま使っている座標
 			cameraPos[GameBossDeath] = eye;
 			//2つめの座標(補間の終点)はプレイヤー座標参照
-			float rota2 =  75.0f;
+			float rota2 = 75.0f;
 			Vector3 nextEye{
-				-cos(MathUtility::PI / 180 * rota2) * cameraDistance/2 ,
+				-cos(MathUtility::PI / 180 * rota2) * cameraDistance / 2 ,
 				0,
-				-sin(MathUtility::PI / 180 * rota2) * cameraDistance/2  };
-			cameraPos[GameBossDeath2] = MathUtility::Vector3Transform(nextEye,player_->GetWorldTransform()->matWorld_);
+				-sin(MathUtility::PI / 180 * rota2) * cameraDistance / 2 };
+			cameraPos[GameBossDeath2] = MathUtility::Vector3Transform(nextEye, player_->GetWorldTransform()->matWorld_);
 		}
 		else {
 			animeTimer += 0.0125f;
@@ -668,7 +674,7 @@ void GameScene::AnimationCameraUpdate()
 			Vector3 pos1, pos2;
 			pos1 = Vector3(boss2Mat.m[3][0], boss2Mat.m[3][1], boss2Mat.m[3][2]);
 			pos2 = player_->GetWorldTransform()->translation_;
-			target = target.lerp(pos1, pos2, easeTime/2);
+			target = target.lerp(pos1, pos2, easeTime / 2);
 
 			titleCamera.eye = eye;
 			titleCamera.target = target;

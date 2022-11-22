@@ -46,41 +46,15 @@ void player::Update() {
 	Vector3 move = { 0,0,0 };
 	Vector3 rot = { 0,0,0 };
 	////プレイヤー移動処理
-	if (input_->PushKey(DIK_A))
+	XINPUT_STATE gamePad;
+	if (input_->GetInstance()->GetJoystickState(0, gamePad))
 	{
-		move.x = -1 * vectorX.x;
-		move.z = -1 * vectorX.z;
-	}
-	if (input_->PushKey(DIK_D))
-	{
-		move.x = 1 * vectorX.x;
-		move.z = 1 * vectorX.z;
-	}
-	if (input_->PushKey(DIK_W))
-	{
-		move.x = 1 * vectorZ.x;
-		move.z = 1 * vectorZ.z;
-	}
-	if (input_->PushKey(DIK_S))
-	{
-		move.x = -1 * vectorZ.x;
-		move.z = -1 * vectorZ.z;
-	}
-	if (input_->PushKey(DIK_Q))
-	{
-		rot.y = -1;
-	}
-	if (input_->PushKey(DIK_E))
-	{
-		rot.y = 1;
-	}
-	if (input_->PushKey(DIK_Z))
-	{
-		rot.x = -1;
-	}
-	if (input_->PushKey(DIK_X))
-	{
-		rot.x = 1;
+		////プレイヤー移動処理
+		move.x += (float)gamePad.Gamepad.sThumbLX / SHRT_MAX * vectorX.x;
+		move.z += (float)gamePad.Gamepad.sThumbLX / SHRT_MAX * vectorX.z;
+		move.x += (float)gamePad.Gamepad.sThumbLY / SHRT_MAX * vectorZ.x;
+		move.z += (float)gamePad.Gamepad.sThumbLY / SHRT_MAX * vectorZ.z;
+		rot.y = (float)gamePad.Gamepad.sThumbRX / SHRT_MAX;
 	}
 
 	float AR;
@@ -103,8 +77,8 @@ void player::Update() {
 	//範囲を超えない処理
 	worldTransform_.rotation_.x = max(worldTransform_.rotation_.x, -kRotLimit);
 	worldTransform_.rotation_.x = min(worldTransform_.rotation_.x, +kRotLimit);
-
-	if (Input::GetInstance()->TriggerKey(DIK_SPACE) && jumpFlag == 0)
+	input_->GetInstance()->GetJoystickState(0, gamePad);
+	if (gamePad.Gamepad.wButtons & XINPUT_GAMEPAD_A && jumpFlag == 0)
 	{
 		jumpFlag = 1;
 	}
@@ -137,7 +111,11 @@ void player::Attack() {
 	{
 		return;
 	}*/
-	if (input_->TriggerKey(DIK_R)) {
+	XINPUT_STATE gamePad;
+	XINPUT_STATE oldGamePad;
+	input_->GetInstance()->GetJoystickState(0, gamePad);
+	input_->GetInstance()->GetJoystickStatePrevious(0, oldGamePad);
+	if (gamePad.Gamepad.bRightTrigger >= 200 && oldGamePad.Gamepad.bRightTrigger < 200) {
 		//弾の速度
 		const float kBulletSpeed = 1.0f;
 		Vector3 velocity(0, 0, kBulletSpeed);
@@ -159,7 +137,7 @@ void player::Attack() {
 }
 
 void player::Draw(ViewProjection& viewProjection_) {
-	if (HP>0)
+	if (HP > 0)
 	{
 		if (isDamageInterval == false)
 		{
@@ -195,7 +173,7 @@ Vector3 player::GetworldPosition()
 }
 void player::SetEndMoveRotation(Vector3 Transform)
 {
-	worldTransform_.translation_ = {0,0,0};
+	worldTransform_.translation_ = { 0,0,0 };
 	// 打つ方向に向けてオブジェクトを回転させる
 	Vector3 velocity = Transform - worldTransform_.translation_;
 	velocity.normalize();
@@ -209,15 +187,15 @@ void player::TransformRset(bool endOrStart)
 		worldTransform_.translation_ = { 0,0,0 };
 		worldTransform_.rotation_ = { 0,0,0 };
 		jumpFlag = 0;
-		defGravitySpeed = gravitySpeed;
+		gravitySpeed = defGravitySpeed;
 		affine::makeAffine(worldTransform_);
 		worldTransform_.TransferMatrix();
 	}
 	else
 	{
 		jumpFlag = 0;
-		defGravitySpeed = gravitySpeed;
-		worldTransform_.translation_.y =0;
+		gravitySpeed = defGravitySpeed;
+		worldTransform_.translation_.y = 0;
 		affine::makeAffine(worldTransform_);
 		worldTransform_.TransferMatrix();
 	}
@@ -230,7 +208,7 @@ void player::Rset()
 
 	jumpFlag = 0u;
 
-	defGravitySpeed = gravitySpeed;
+	gravitySpeed = defGravitySpeed;
 
 	isDamageInterval = false;
 

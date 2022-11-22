@@ -63,7 +63,7 @@ public:
 
 	void Rset();
 
-	int GetHP() {return HP; }
+	int GetHP() { return HP; }
 private:
 	//ワールド変換データ
 	WorldTransform worldTransform_;
@@ -89,8 +89,8 @@ private:
 
 	uint8_t jumpFlag = 0u;
 
-	float gravitySpeed = 1.5;
-	float defGravitySpeed = gravitySpeed;
+	const float defGravitySpeed = 1.5;
+	float gravitySpeed = defGravitySpeed;
 
 	const int maxHP = 1;
 	int HP = maxHP;
